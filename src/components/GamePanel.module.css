@@ -1,0 +1,533 @@
+.game {
+  padding-top: 30px;
+}
+.mobileClue {
+  display: none;
+}
+.gameHeading {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 27px;
+  flex-wrap: wrap;
+}
+.gameTheme {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.gameTheme > span {
+  font-size: 24px;
+}
+.stepBadge {
+  margin-inline-start: auto;
+  background: #f1f3e9;
+  border: 1px solid #d6ddcd;
+  border-radius: 30px;
+  padding: 9px 15px;
+  font-size: 11px;
+}
+.gameLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.board {
+  background: white;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+}
+.boardHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.boardStar {
+  font-size: 32px;
+  color: #b09b66;
+  line-height: 1;
+}
+.board h2 {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 12px 0 25px;
+}
+.clues {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.clue {
+  border: 1px solid #e4e5de;
+  background: #fafaf7;
+  border-radius: 13px;
+  padding: 16px 19px 20px;
+  transition:
+    border-color 200ms,
+    background 200ms;
+}
+.clue[data-active="true"] {
+  border-color: #8b9c7a;
+  background: #eff3e5;
+  box-shadow: 0 0 0 2px #b8c3a425;
+}
+.clue[data-solved="true"] {
+  background: #f3f7f1;
+  border-color: #d5e1ce;
+}
+.clueCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #627059;
+  font-size: 10px;
+  margin-bottom: 14px;
+}
+.clueCaption > span:first-child {
+  font-weight: 650;
+  letter-spacing: 0.8px;
+}
+.equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.5;
+  font-weight: 500;
+}
+.expression {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  white-space: nowrap;
+}
+.operator {
+  color: #8a9582;
+  font-weight: 300;
+  font-size: 0.72em;
+}
+.bracket {
+  font-weight: 300;
+  color: #a1a992;
+  font-size: 0.72em;
+}
+.total {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.substitution {
+  color: #476446;
+  background: #e5ebd9;
+  border-radius: 7px;
+  padding: 0 5px;
+}
+.symbolShelf {
+  margin-top: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding-top: 24px;
+  border-top: 1px dashed #d4d9cd;
+}
+.symbolChip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 10px;
+  border: 1px solid #e3e5dc;
+  background: #f8f9f4;
+  padding: 9px 12px;
+  font-size: 22px;
+}
+.symbolChip > span:nth-child(2) {
+  color: #8b9582;
+  font-size: 16px;
+}
+.symbolChip > strong {
+  font-size: 17px;
+  font-weight: 600;
+  color: #7d8875;
+}
+.symbolChip[data-found="true"] {
+  background: #edf3e7;
+  border-color: #cddcc2;
+}
+.symbolChip[data-found="true"] > strong {
+  color: var(--green);
+}
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.solver {
+  background: #f4eddf;
+  border: 1px solid #e4dac8;
+  border-radius: 22px;
+  padding: 28px;
+}
+.solverHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.solverHeading > span:last-child {
+  color: #b69b69;
+  font-size: 24px;
+}
+.targetEmoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 23px;
+  margin: 17px 0;
+  font-size: 64px;
+}
+.targetEmoji > span:last-child {
+  font-family: Georgia, serif;
+  font-size: 43px;
+  color: #98856b;
+}
+.solver h2 {
+  font-size: 20px;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+  text-align: center;
+  margin: 0 0 25px;
+}
+.solver form {
+  display: grid;
+  gap: 10px;
+}
+.solver form label {
+  font-size: 12px;
+  font-weight: 650;
+}
+.solver form input {
+  border: 1px solid #c6c7b5;
+  border-radius: 11px;
+  background: #fffdf8;
+  color: var(--ink);
+  padding: 12px;
+  font-size: 29px;
+  text-align: center;
+  width: 100%;
+}
+.solver form input::placeholder {
+  color: #a1a48f;
+}
+.solver form button {
+  margin-top: 4px;
+}
+.feedback {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 14px 0 0;
+  color: #746957;
+  min-height: 42px;
+}
+.feedback[data-feedback="correct"] {
+  color: #35594a;
+  font-weight: 550;
+}
+.feedback[data-feedback="invalid"] {
+  color: #914b37;
+}
+.keypadToggle {
+  border: 0;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  color: #6c614e;
+  padding: 12px 0;
+  font-size: 11px;
+  min-height: 44px;
+}
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 3px 0 15px;
+  direction: ltr;
+}
+.keypad button {
+  background: #fffcf4;
+  border: 1px solid #d1cbb8;
+  border-radius: 8px;
+  min-height: 45px;
+  font-size: 18px;
+}
+.keypad button:hover {
+  background: #fff6df;
+}
+.hintSection {
+  border-top: 1px solid #dfd6c4;
+  padding-top: 16px;
+  margin-top: 3px;
+}
+.hintButton {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 9px;
+  width: 100%;
+  font-size: 12px;
+  font-weight: 600;
+  border: 0;
+  background: transparent;
+  padding: 6px 0;
+  min-height: 40px;
+}
+.hintButton > span:first-child {
+  font-size: 23px;
+  color: #9e7d3d;
+}
+.hintButton:disabled {
+  color: #837865;
+}
+.hintDots {
+  display: flex;
+  gap: 4px;
+  margin-inline-start: auto;
+}
+.hintDots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid #a29276;
+}
+.hintDots i[data-on="true"] {
+  background: #a29276;
+}
+.hintContent {
+  background: #fff9eb;
+  border: 1px solid #e3d9bf;
+  border-radius: 11px;
+  padding: 16px;
+  margin-top: 12px;
+}
+.hintContent strong {
+  font-size: 12px;
+}
+.hintContent p {
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 8px 0 0;
+  color: #675e4d;
+}
+.hintContent .equation {
+  margin-top: 12px;
+  font-size: 21px;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.hintContent .expression {
+  gap: 7px;
+}
+.completion {
+  text-align: center;
+  padding: 35px 25px;
+  border: 1px solid #cdd9bf;
+  border-radius: 22px;
+  background: #edf2e4;
+}
+.celebration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 70px;
+  margin: 4px 0 23px;
+  animation: bloom 600ms ease-out;
+}
+.celebration span {
+  color: #aaa46a;
+  font-size: 25px;
+}
+.celebration span:first-child {
+  transform: translateY(-15px);
+}
+.celebration span:last-child {
+  transform: translateY(13px);
+}
+.completion h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 33px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.9px;
+  margin: 17px 0;
+}
+.completion > p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.completion > button {
+  width: 100%;
+}
+.completion > button:last-of-type {
+  margin-top: 6px;
+}
+.suggestion {
+  border-top: 1px solid #d3dec5;
+  margin-top: 20px;
+  padding-top: 12px;
+}
+.suggestion p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.suggestion small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+  margin-top: 12px;
+}
+@keyframes bloom {
+  from {
+    opacity: 0;
+    transform: scale(0.75) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+@media (max-width: 1050px) {
+  .gameLayout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+  .board {
+    padding: 23px;
+  }
+  .equation {
+    gap: 9px;
+    font-size: 30px;
+  }
+  .expression {
+    gap: 9px;
+  }
+  .solver {
+    padding: 24px;
+  }
+}
+@media (max-width: 760px) {
+  .mobileClue {
+    display: block;
+    background: #fff9ee;
+    border: 1px solid #e0d6c1;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-top: 18px;
+  }
+  .mobileClue > span {
+    display: block;
+    font-size: 10px;
+    color: #746957;
+    margin-bottom: 8px;
+  }
+  .mobileClue .equation {
+    font-size: 28px;
+  }
+  .sideColumn {
+    display: contents;
+  }
+  .solver,
+  .completion {
+    grid-row: 1;
+  }
+  .board {
+    grid-row: 2;
+  }
+  .sideColumn > section:last-child {
+    grid-row: 3;
+  }
+  .game {
+    padding-top: 20px;
+  }
+  .gameHeading {
+    gap: 10px 18px;
+    margin-bottom: 20px;
+  }
+  .gameTheme {
+    margin-inline-start: auto;
+    font-size: 12px;
+  }
+  .stepBadge {
+    margin-inline-start: 0;
+    width: 100%;
+    text-align: center;
+  }
+  .gameLayout {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .board {
+    padding: 22px 18px;
+  }
+  .board h2 {
+    font-size: 12px;
+    margin: 12px 0 20px;
+  }
+  .clue {
+    padding: 14px 12px 17px;
+  }
+  .clueCaption {
+    font-size: 9px;
+    margin-bottom: 10px;
+  }
+  .equation {
+    font-size: clamp(22px, 6.7vw, 36px);
+    gap: 8px;
+  }
+  .expression {
+    gap: 8px;
+  }
+  .symbolShelf {
+    gap: 7px;
+    margin-top: 20px;
+    padding-top: 19px;
+  }
+  .symbolChip {
+    font-size: 21px;
+    padding: 7px 10px;
+    gap: 6px;
+  }
+  .sideColumn {
+    gap: 20px;
+  }
+  .solver {
+    padding: 26px;
+  }
+  .solver h2 {
+    font-size: 21px;
+  }
+  .completion {
+    padding: 30px 25px;
+  }
+}
+@media (max-width: 390px) {
+  .equation,
+  .expression {
+    gap: 6px;
+  }
+  .equation {
+    font-size: 23px;
+  }
+  .solver {
+    padding: 22px;
+  }
+}
