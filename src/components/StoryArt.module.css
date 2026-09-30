@@ -1,0 +1,52 @@
+.icon {
+  line-height: 1;
+  filter: drop-shadow(0 1px 0 rgba(74, 47, 30, 0.12));
+}
+
+.cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  border-radius: inherit;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(160deg, #fffef8, var(--art-sky));
+}
+
+.coverLandscape {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 70%;
+  opacity: 0.8;
+}
+
+.coverObject {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 70%;
+  block-size: 70%;
+  filter: drop-shadow(0 3px 2px rgba(56, 42, 31, 0.16));
+}
+
+.landscape {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.panorama {
+  position: relative;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.panoramaDetails {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}

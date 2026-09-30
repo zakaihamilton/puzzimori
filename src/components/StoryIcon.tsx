@@ -1,3 +1,6 @@
+import { useId } from "react";
+import styles from "./StoryArt.module.css";
+
 interface StoryIconProps {
   value: string;
   className?: string | undefined;
@@ -5,13 +8,14 @@ interface StoryIconProps {
 }
 
 export function StoryIcon({ value, className, size = "1em" }: StoryIconProps) {
+  const id = useId();
   const icon = getStorySvg(value);
   if (!icon) {
-    return <span className={className}>{value}</span>;
+    return <span className={[styles.icon, className].filter(Boolean).join(" ")}>{value}</span>;
   }
   return (
     <span
-      className={className}
+      className={[styles.icon, className].filter(Boolean).join(" ")}
       style={{
         display: "inline-flex",
         alignItems: "center",
@@ -31,7 +35,39 @@ export function StoryIcon({ value, className, size = "1em" }: StoryIconProps) {
         xmlns="http://www.w3.org/2000/svg"
         style={{ overflow: "visible" }}
       >
-        {icon}
+        <defs>
+          <filter
+            id={`${id}-light`}
+            x="-15%"
+            y="-15%"
+            width="130%"
+            height="140%"
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur in="SourceAlpha" stdDeviation="1.4" result="soft" />
+            <feSpecularLighting
+              in="soft"
+              surfaceScale="2"
+              specularConstant="0.22"
+              specularExponent="18"
+              lightingColor="#fff6df"
+              result="light"
+            >
+              <feDistantLight azimuth="225" elevation="55" />
+            </feSpecularLighting>
+            <feComposite in="light" in2="SourceAlpha" operator="in" result="shine" />
+            <feComposite
+              in="SourceGraphic"
+              in2="shine"
+              operator="arithmetic"
+              k1="0"
+              k2="1"
+              k3="0.65"
+              k4="0"
+            />
+          </filter>
+        </defs>
+        <g filter={`url(#${id}-light)`}>{icon}</g>
       </svg>
     </span>
   );
