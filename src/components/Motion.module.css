@@ -1,0 +1,152 @@
+.scenery {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+.float {
+  position: absolute;
+  font-size: 42px;
+  opacity: 0.18;
+  animation: drift 8s ease-in-out infinite;
+  user-select: none;
+}
+
+.float:nth-child(1) {
+  inset-inline-start: 2%;
+  top: 6px;
+}
+
+.float:nth-child(2) {
+  inset-inline-end: 25%;
+  top: 18px;
+  animation-delay: -3s;
+  font-size: 34px;
+}
+
+.float:nth-child(3) {
+  inset-inline-end: 2%;
+  top: 8px;
+  animation-delay: -5s;
+}
+
+.companion {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: clamp(52px, 7.5vh, 74px);
+  height: clamp(52px, 7.5vh, 74px);
+  flex-shrink: 0;
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ffffff 0%,
+    #fffbe8 45%,
+    #fce9be 85%,
+    #f5d496 100%
+  );
+  border: 2.5px solid var(--gold);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px var(--gold-glow),
+    0 4px 12px rgba(200, 138, 44, 0.22),
+    inset 0 2px 3px #ffffff,
+    inset 0 -2px 3px rgba(180, 110, 20, 0.2);
+}
+
+.reaction {
+  display: block;
+  font-size: clamp(32px, 4.6vh, 46px);
+  line-height: 1.2;
+  filter: drop-shadow(0 2px 4px rgba(100, 60, 10, 0.22));
+}
+
+.idle {
+  display: block;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.reaction[data-reaction="correct"],
+.reaction[data-reaction="complete"] {
+  animation: happy 550ms ease-out;
+}
+
+.reaction[data-reaction="hint"] {
+  animation: ponder 500ms ease-out;
+}
+
+.reaction[data-reaction="retry"] {
+  animation: encourage 450ms ease-out;
+}
+
+.sparkle {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  color: #c88a2c;
+  font-size: 26px;
+  animation: sparkle 750ms ease-out both;
+  text-shadow: 0 0 8px rgba(200, 138, 44, 0.4);
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(10px) rotate(4deg);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(2deg);
+  }
+}
+
+@keyframes happy {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  40% {
+    transform: translateY(-8px) scale(1.1);
+  }
+  70% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes ponder {
+  50% {
+    transform: rotate(-10deg) scale(1.04);
+  }
+}
+
+@keyframes encourage {
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.7);
+  }
+}

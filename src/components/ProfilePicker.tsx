@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
 import { avatars } from "../storage/profiles";
+import { Companion } from "./Companion";
 import { Emoji } from "./Emoji";
 import styles from "./Puzzimori.module.css";
 
@@ -33,12 +34,10 @@ export function ProfilePicker({
     <section className={styles.profileSection} aria-labelledby="profile-title">
       <div className={styles.sectionHeading}>
         <div>
-          <h2 id="profile-title">{m.chooseProfile}</h2>
+          <h1 id="profile-title">{m.chooseProfile}</h1>
           <p>{m.profileIntro}</p>
         </div>
-        <span className={styles.handStar} aria-hidden="true">
-          ✧
-        </span>
+        <Companion avatar={avatar} />
       </div>
       <div className={styles.profileLayout}>
         {profiles.length > 0 && (

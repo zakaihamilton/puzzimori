@@ -93,9 +93,15 @@ export function modelReducer(state: SavedData, action: ModelAction): SavedData {
     return {
       ...state,
       locale: action.locale,
-      profiles: state.profiles.map((profile) =>
-        profile.id === state.activeId ? { ...profile, locale: action.locale } : profile,
-      ),
+      profiles: state.profiles.map((profile) => {
+        if (profile.id !== state.activeId) return profile;
+        const wasDefaultName = profile.name === "Explorer" || profile.name === "מגלה";
+        return {
+          ...profile,
+          locale: action.locale,
+          name: wasDefaultName ? (action.locale === "he" ? "מגלה" : "Explorer") : profile.name,
+        };
+      }),
     };
   return {
     ...state,

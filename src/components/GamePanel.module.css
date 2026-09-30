@@ -1,604 +1,968 @@
+/* ==========================================================================
+   Storybook Game Panel: Height-Fitting Layout for Kids
+   ========================================================================== */
+
 .game {
-  padding-top: 30px;
-}
-.mobileClue {
-  display: block;
-  background: #ffffff;
-  border: 2px solid #bbb2ed;
-  border-radius: 18px;
-  padding: 14px;
-  margin: 12px 0;
-}
-.mobileClue > span {
-  display: block;
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-.gameHeading {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 27px;
-  flex-wrap: wrap;
-}
-.gameTheme {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 18px;
-  font-weight: 600;
-}
-.gameTheme > span {
-  font-size: 24px;
-}
-.stepBadge {
-  margin-inline-start: auto;
-  background: #f1f3e9;
-  border: 1px solid #d6ddcd;
-  border-radius: 30px;
-  padding: 9px 15px;
-  font-size: 16px;
-}
-.gameLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
-  gap: 28px;
-  align-items: start;
-}
-.board {
-  background: white;
-  padding: 30px;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-}
-.boardHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.boardStar {
-  font-size: 32px;
-  color: #b09b66;
-  line-height: 1;
-}
-.board h2 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--muted);
-  line-height: 1.7;
-  margin: 12px 0 25px;
-}
-.clues {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  overflow: hidden;
 }
-.clue {
-  border: 1px solid #e4e5de;
-  background: #fafaf7;
-  border-radius: 13px;
-  padding: 16px 19px 20px;
-  transition:
-    border-color 200ms,
-    background 200ms;
-}
-.clue[data-active="true"] {
-  border-color: #7663bd;
-  background: #eee9ff;
-  box-shadow: 0 0 0 2px #b8c3a425;
-}
-.clue[data-solved="true"] {
-  background: #f3f7f1;
-  border-color: #d5e1ce;
-}
-.clueCaption {
+
+/* Board Header: Integrated Companion, World Badge & Progress Dots */
+.boardHeader {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  color: #627059;
-  font-size: 15px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-block-end: clamp(6px, 1.2vh, 10px);
+  padding-block-end: clamp(6px, 1.2vh, 10px);
+  border-block-end: 1.5px dashed var(--line);
 }
-.clueCaption > span:first-child {
-  font-weight: 650;
-  letter-spacing: 0.8px;
-}
-.equation {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 13px;
-  font-size: clamp(24px, 3vw, 38px);
-  line-height: 1.5;
-  font-weight: 500;
-}
-.expression {
+
+.boardCompanion {
   display: inline-flex;
   align-items: center;
-  gap: 13px;
-  white-space: nowrap;
+  gap: 8px;
 }
-.operator {
-  color: #58617a;
-  font-weight: 300;
-  font-size: 0.72em;
-}
-.bracket {
-  font-weight: 300;
-  color: #a1a992;
-  font-size: 0.72em;
-}
-.total {
-  font-variant-numeric: tabular-nums;
+
+.boardTheme {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-serif);
+  font-size: clamp(13px, 1.8vh, 16px);
+  font-weight: 700;
   color: var(--ink);
+  background: var(--paper-card);
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  box-shadow: 0 1px 3px rgba(78, 59, 36, 0.04);
 }
-.substitution {
-  color: #476446;
-  background: #e5ebd9;
-  border-radius: 7px;
-  padding: 0 5px;
+
+.boardTheme > span:first-child {
+  font-size: clamp(16px, 2.2vh, 20px);
+  line-height: 1;
 }
-.symbolShelf {
-  margin-top: 25px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  padding-top: 24px;
-  border-top: 1px dashed #d4d9cd;
-}
-.symbolChip {
-  display: flex;
+
+.stepBadge {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  border-radius: 10px;
-  border: 1px solid #e3e5dc;
-  background: #f8f9f4;
-  padding: 9px 12px;
-  font-size: 22px;
-}
-.symbolChip > span:nth-child(2) {
-  color: #8b9582;
-  font-size: 16px;
-}
-.symbolChip > strong {
-  font-size: 17px;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
   font-weight: 600;
-  color: #7d8875;
+  color: var(--muted);
+  box-shadow: 0 1px 3px rgba(78, 59, 36, 0.04);
 }
-.symbolChip[data-found="true"] {
-  background: #edf3e7;
-  border-color: #cddcc2;
+
+.stepText {
+  white-space: nowrap;
 }
-.symbolChip[data-found="true"] > strong {
-  color: var(--green);
+
+.progressDots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
 }
+
+.progressDots > span {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--paper-tint);
+  border: 1.5px solid var(--line-strong);
+  font-family: var(--font-serif);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  transition: all 200ms ease-out;
+}
+
+.progressDots > span[data-current="true"] {
+  background: var(--gold);
+  border-color: var(--gold-dark);
+  color: #ffffff;
+  box-shadow: 0 0 6px var(--gold-glow);
+  transform: scale(1.1);
+}
+
+.progressDots > span[data-done="true"] {
+  background: var(--mint);
+  border-color: var(--mint-accent);
+  color: var(--mint-accent);
+  animation: solvedPop 350ms ease-out;
+}
+
+/* Two-column layout fitting viewport height */
+.gameLayout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 14px;
+  align-items: stretch;
+  overflow: hidden;
+}
+
 .sideColumn {
   display: contents;
 }
+
 .solver,
 .completion {
   grid-column: 1;
   grid-row: 1;
 }
+
 .board {
   grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-row: 1;
 }
-.sideColumn > section:last-child {
-  grid-column: 1;
-  grid-row: 2;
-}
-.progressDots {
+
+/* --------------------------------------------------------------------------
+   Clue Board: The Open Parchment Volume
+   -------------------------------------------------------------------------- */
+.board {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
+  flex-direction: column;
+  background: var(--paper-card);
+  border: 2px solid var(--line);
+  border-radius: 20px;
+  padding: 14px 18px;
+  box-shadow:
+    0 4px 10px rgba(78, 59, 36, 0.04),
+    inset 0 0 20px rgba(220, 205, 175, 0.1);
+  overflow: hidden;
 }
-.progressDots > span {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: white;
-  border: 2px solid #d0c7f1;
-  font-size: 16px;
-  font-weight: 750;
-}
-.progressDots > span[data-done="true"] {
-  background: #dff4e6;
-  border-color: #4a8763;
-}
-.progressDots > span[data-current="true"] {
-  background: var(--green);
-  border-color: var(--green);
-  color: white;
-}
-.keyboardHelp {
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--muted);
-  margin: 12px 0;
-}
-.solver {
-  background: #eee9ff;
-  border: 2px solid #d6cbfb;
-  border-radius: 22px;
-  padding: 22px;
-}
-.solverHeading {
+
+.board h2 {
+  flex-shrink: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(16px, 2.2vh, 19px);
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 8px;
+  padding-block-end: 6px;
+  border-block-end: 1.5px dashed var(--line);
+  letter-spacing: -0.3px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 6px;
 }
-.solverHeading > span:last-child {
-  color: #b69b69;
-  font-size: 24px;
+
+.board h2::before {
+  content: "📖";
+  font-size: 16px;
 }
-.targetEmoji {
+
+.clues {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2vh, 12px);
+  justify-content: stretch;
+  overflow: hidden;
+}
+
+/* Individual Clue Scrolls: Resize to fit section */
+.clue {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(180deg, #ffffff 0%, #fdfbf7 100%);
+  border: 1.5px solid var(--line);
+  border-radius: clamp(10px, 1.5vh, 16px);
+  padding: clamp(4px, 0.8vh, 10px) clamp(10px, 1.5vw, 16px);
+  position: relative;
+  transition: all 180ms cubic-bezier(0.2, 0.8, 0.3, 1);
+  box-shadow: 0 2px 5px rgba(78, 59, 36, 0.05);
+}
+
+.clueCaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-size: clamp(12.5px, 1.7vh, 15px);
+  font-weight: 700;
+  color: var(--ink);
+  margin-block-end: 2px;
+  line-height: 1;
+}
+
+.clueCaption > span:first-child {
+  font-size: clamp(12.5px, 1.7vh, 15px);
+  letter-spacing: 0.2px;
+  font-weight: 700;
+  color: #5c432d;
+}
+
+/* Active Clue: Candlelight Golden Aura */
+.clue[data-active="true"] {
+  background: linear-gradient(135deg, #fffdf8 0%, #fff7e6 100%);
+  border: 2px solid var(--gold);
+  box-shadow:
+    0 0 0 2px var(--gold-glow),
+    0 4px 14px rgba(200, 138, 44, 0.16);
+  transform: translateY(-1px);
+}
+
+.clue[data-active="true"] .clueCaption > span:last-child {
+  color: var(--gold-dark);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* Solved Clue: Herb & Sage Parchment Ribbon */
+.clue[data-solved="true"] {
+  background: linear-gradient(135deg, #f7faf5 0%, #edf5eb 100%);
+  border-color: #bcd1ba;
+}
+
+.clue[data-solved="true"] .clueCaption > span:last-child {
+  color: var(--sage-dark);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Equation Styling: Mathematical Typography & Stamp Tokens
+   -------------------------------------------------------------------------- */
+.equation {
+  flex: 1;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 23px;
-  margin: 10px 0;
-  font-size: 52px;
-}
-.targetEmoji > span:last-child {
-  font-family: Georgia, serif;
-  font-size: 43px;
-  color: #98856b;
-}
-.solver h2 {
-  font-size: 20px;
-  letter-spacing: -0.5px;
-  line-height: 1.35;
-  text-align: center;
-  margin: 0 0 16px;
-}
-.solver form {
-  display: grid;
-  gap: 10px;
-}
-.solver form label {
-  font-size: 17px;
-  font-weight: 650;
-}
-.solver form output {
-  display: block;
-  min-height: 66px;
-  font-weight: 750;
-  border: 1px solid #c6c7b5;
-  border-radius: 11px;
-  background: #fffdf8;
+  gap: clamp(8px, 1.4vw, 18px);
+  font-family: var(--font-serif);
+  font-size: clamp(22px, min(3.8vh, 3.4vw), 34px);
+  line-height: 1.2;
+  font-weight: 700;
   color: var(--ink);
-  padding: 12px;
-  font-size: 29px;
-  text-align: center;
-  width: 100%;
+  user-select: none;
 }
 
-.solver form button {
-  margin-top: 4px;
+.expression {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(6px, 1.2vw, 12px);
+  white-space: nowrap;
 }
-.feedback {
-  font-size: 17px;
-  line-height: 1.7;
-  margin: 14px 0 0;
-  color: #746957;
-  min-height: 42px;
+
+.operator {
+  color: #5c432d;
+  font-weight: 800;
+  font-size: 1em;
+  padding-inline: 2px;
 }
-.feedback[data-feedback="correct"] {
-  color: #35594a;
-  font-weight: 550;
+
+.bracket {
+  color: #8c765a;
+  font-weight: 600;
+  font-size: 1em;
 }
-.feedback[data-feedback="invalid"] {
-  color: #914b37;
+
+.total {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  color: var(--ink);
 }
-.keypadToggle {
-  border: 0;
-  background: transparent;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  color: #6c614e;
-  padding: 12px 0;
-  font-size: 16px;
-  min-height: 44px;
+
+/* Emoji Medallion Seal - 3D Tactile Graphic */
+.symbolToken {
+  display: inline-grid;
+  place-items: center;
+  width: clamp(38px, min(6vh, 5.2vw), 54px);
+  height: clamp(38px, min(6vh, 5.2vw), 54px);
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ffffff 0%,
+    #fffdf8 40%,
+    #fbf3e4 80%,
+    #f5e3c7 100%
+  );
+  border: 2px solid #dfc6a3;
+  border-radius: 50%;
+  box-shadow:
+    0 3px 8px rgba(110, 75, 25, 0.16),
+    inset 0 2px 2px rgba(255, 255, 255, 0.95),
+    inset 0 -2px 3px rgba(180, 125, 50, 0.2);
+  font-size: clamp(24px, min(4vh, 3.6vw), 36px);
+  line-height: 1;
+  vertical-align: middle;
+  filter: drop-shadow(0 2px 3px rgba(70, 45, 15, 0.2));
+  transition: transform 150ms cubic-bezier(0.2, 0.8, 0.3, 1.2);
 }
+
+/* Substitution Badge: Discovered known values inside equations */
+.substitution {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(32px, min(4.8vh, 4vw), 46px);
+  height: clamp(32px, min(4.8vh, 4vw), 46px);
+  padding-inline: 6px;
+  background: var(--gold-light);
+  border: 2px solid var(--gold);
+  border-radius: 10px;
+  color: var(--gold-dark);
+  font-weight: 800;
+  font-size: 0.9em;
+  box-shadow:
+    0 2px 6px rgba(200, 138, 44, 0.2),
+    inset 0 1px 2px #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Symbol Shelf: Discovered Numbers at the Base of the Volume
+   -------------------------------------------------------------------------- */
+.symbolShelf {
+  flex-shrink: 0;
+  margin-block-start: 6px;
+  padding-block-start: 6px;
+  border-block-start: 1.5px dashed var(--line);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  height: clamp(42px, 6vh, 50px);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.symbolChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(180deg, #faf6ee 0%, #f2e8d7 100%);
+  border: 1.5px solid #d8c7b0;
+  border-radius: 999px;
+  padding: 3px 10px 3px 4px;
+  font-family: var(--font-serif);
+  font-size: clamp(15px, 2.1vh, 18px);
+  color: var(--muted);
+  box-shadow: 0 1px 3px rgba(78, 59, 36, 0.08);
+}
+
+.symbolChip .symbolToken {
+  width: clamp(28px, 3.8vh, 36px);
+  height: clamp(28px, 3.8vh, 36px);
+  font-size: clamp(18px, 2.4vh, 22px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.symbolChip > span:nth-child(2) {
+  color: #7b654f;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.symbolChip > strong {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.symbolChip[data-found="true"] {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 60%, #bbf7d0 100%);
+  border-color: #4ade80;
+  color: #15803d;
+  box-shadow:
+    0 0 0 2px rgba(74, 222, 128, 0.25),
+    0 2px 6px rgba(22, 163, 74, 0.2);
+}
+
+.symbolChip[data-found="true"] > strong {
+  color: #15803d;
+}
+
+/* --------------------------------------------------------------------------
+   Solver Station: The Child's Discovery Desk
+   -------------------------------------------------------------------------- */
+.solver {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #fffdf8 0%, #faf3e6 100%);
+  border: 2px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 12px 16px;
+  box-shadow:
+    0 4px 14px rgba(78, 59, 36, 0.08),
+    inset 0 0 20px rgba(220, 205, 175, 0.12);
+  overflow: hidden;
+}
+
+/* Solver Form & Target Answer Card */
+.solverForm {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.solverPrompt {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: clamp(15px, 2.2vh, 18px);
+  font-weight: 700;
+  color: #5c432d;
+  margin-block-end: clamp(2px, 0.6vh, 6px);
+}
+
+.targetHeading {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.5vw, 16px);
+  margin: 0 0 clamp(4px, 1vh, 8px);
+  direction: ltr;
+}
+
+.targetCard {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 12px);
+}
+
+.targetCard .symbolToken {
+  width: clamp(54px, 8.2vh, 76px);
+  height: clamp(54px, 8.2vh, 76px);
+  background: radial-gradient(
+    circle at 35% 30%,
+    #ffffff 0%,
+    #fffbe8 45%,
+    #fce9be 85%,
+    #f5d496 100%
+  );
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3px var(--gold-glow),
+    0 6px 16px rgba(200, 138, 44, 0.28),
+    inset 0 3px 4px #ffffff,
+    inset 0 -3px 4px rgba(180, 110, 20, 0.25);
+  font-size: clamp(34px, 5.2vh, 48px);
+  filter: drop-shadow(0 3px 5px rgba(120, 70, 10, 0.25));
+}
+
+.targetEquals {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.8vh, 44px);
+  font-weight: 800;
+  color: #7b654f;
+}
+
+.targetOutput {
+  display: grid;
+  place-items: center;
+  min-width: clamp(88px, 13vw, 136px);
+  height: clamp(54px, 8.2vh, 74px);
+  padding: 0 clamp(12px, 1.8vw, 22px);
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+  border: 3px solid var(--gold);
+  border-radius: clamp(14px, 1.8vh, 18px);
+  box-shadow:
+    0 0 0 3px var(--gold-glow),
+    0 4px 12px rgba(200, 138, 44, 0.2),
+    inset 0 2px 4px rgba(200, 138, 44, 0.08);
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.6vh, 42px);
+  font-weight: 800;
+  color: #2b1f14;
+  letter-spacing: 2px;
+  outline: none;
+  cursor: default;
+}
+
+.answerDigit {
+  display: inline-block;
+  animation: digitPop 150ms ease-out;
+}
+
+/* --------------------------------------------------------------------------
+   Tactile Wooden Block Keypad: Chunky & Tablet-Ready
+   -------------------------------------------------------------------------- */
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-  margin: 3px 0 15px;
+  gap: clamp(6px, 1.2vh, 12px);
+  margin: clamp(6px, 1.2vh, 12px) 0;
   direction: ltr;
-}
-.keypad button {
-  background: #fffcf4;
-  border: 1px solid #d1cbb8;
-  border-radius: 8px;
-  min-height: 56px;
-  font-size: 24px;
-  font-weight: 700;
-}
-.keypad button:hover {
-  background: #fff6df;
-}
-.hintSection {
-  border-top: 1px solid #dfd6c4;
-  padding-top: 16px;
-  margin-top: 3px;
-}
-.hintButton {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 9px;
   width: 100%;
-  font-size: 17px;
-  font-weight: 600;
-  border: 0;
-  background: #fff2b8;
-  border-radius: 14px;
-  padding: 10px 14px;
-  min-height: 56px;
 }
-.hintButton > span:first-child {
-  font-size: 23px;
-  color: #9e7d3d;
+
+.keypad button {
+  height: clamp(48px, 7.5vh, 76px);
+  min-height: 46px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf6f0 55%, #f2ebde 100%);
+  border: 2px solid #dfd1bd;
+  border-radius: clamp(12px, 1.6vh, 18px);
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.8vh, 34px);
+  font-weight: 800;
+  color: #3b2c1f;
+  box-shadow:
+    0 4px 0 #cbba9f,
+    0 5px 8px rgba(60, 42, 20, 0.12),
+    inset 0 1px 2px #ffffff;
+  transition:
+    transform 80ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 80ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    background 150ms;
+  user-select: none;
+  touch-action: manipulation;
 }
-.hintButton:disabled {
-  color: #837865;
+
+.keypad button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 55%, #f6efe3 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 #cbba9f,
+    0 6px 12px rgba(60, 42, 20, 0.15);
 }
-.hintDots {
-  display: flex;
-  gap: 4px;
-  margin-inline-start: auto;
+
+.keypad button:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #cbba9f,
+    0 2px 4px rgba(60, 42, 20, 0.12);
 }
-.hintDots i {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  border: 1px solid #a29276;
+
+.keypad button[data-answer-key]:last-child {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 55%, #fecaca 100%);
+  border-color: #fca5a5;
+  color: #b91c1c;
+  box-shadow:
+    0 4px 0 #f87171,
+    0 5px 8px rgba(239, 68, 68, 0.15),
+    inset 0 1px 2px #ffffff;
 }
-.hintDots i[data-on="true"] {
-  background: #a29276;
+
+.keypad button[data-answer-key]:last-child:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #f87171,
+    0 2px 4px rgba(239, 68, 68, 0.15);
 }
-.hintContent {
-  background: #fff9eb;
-  border: 1px solid #e3d9bf;
-  border-radius: 11px;
-  padding: 16px;
-  margin-top: 12px;
+
+.keypadSpacer {
+  visibility: hidden;
+  pointer-events: none;
 }
-.hintContent strong {
-  font-size: 17px;
+
+.solverForm > button,
+.solver form > button {
+  height: clamp(48px, 7vh, 66px);
+  min-height: 46px;
+  font-size: clamp(18px, 2.6vh, 23px);
+  font-weight: 800;
+  border-radius: clamp(12px, 1.6vh, 18px);
+  padding: 8px 18px;
+  touch-action: manipulation;
 }
-.hintContent p {
-  font-size: 17px;
-  line-height: 1.8;
-  margin: 8px 0 0;
-  color: #675e4d;
-}
-.hintContent .equation {
-  margin-top: 12px;
-  font-size: 21px;
-  gap: 7px;
-  flex-wrap: wrap;
-}
-.hintContent .expression {
-  gap: 7px;
-}
-.completion {
+
+/* Live Feedback Notice */
+.feedback {
+  flex-shrink: 0;
+  font-size: clamp(14px, 2vh, 17px);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 4px 0 0;
   text-align: center;
-  padding: 35px 25px;
-  border: 1px solid #cdd9bf;
-  border-radius: 22px;
-  background: #edf2e4;
+  color: var(--muted);
+  min-height: clamp(20px, 3vh, 26px);
 }
+
+.feedback[data-feedback="correct"] {
+  color: var(--sage-dark);
+}
+
+.feedback[data-feedback="incorrect"] {
+  color: var(--crimson);
+}
+
+.feedback[data-feedback="invalid"] {
+  color: var(--crimson-dark);
+}
+
+.feedback[data-feedback="ready"] {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Completion / Celebration Scroll
+   -------------------------------------------------------------------------- */
+.completion {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 24px;
+  background: linear-gradient(180deg, #f9fdf8 0%, #edf7eb 100%);
+  border: 2px solid #b7d6b3;
+  border-radius: 20px;
+  box-shadow:
+    0 4px 16px rgba(55, 110, 60, 0.08),
+    inset 0 0 24px rgba(200, 235, 195, 0.15);
+}
+
 .celebration {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  font-size: 70px;
-  margin: 4px 0 23px;
-  animation: bloom 600ms ease-out;
+  gap: 10px;
+  font-size: 42px;
+  margin: 0 0 10px;
+  position: relative;
 }
+
 .celebration span {
-  color: #aaa46a;
-  font-size: 25px;
+  font-size: 20px;
+  color: var(--gold);
 }
-.celebration span:first-child {
-  transform: translateY(-15px);
+
+.celebration i {
+  position: absolute;
+  font-size: 16px;
+  font-style: normal;
+  color: var(--gold);
+  animation: party 1.4s ease-out both;
 }
-.celebration span:last-child {
-  transform: translateY(13px);
+
+.celebration i:nth-of-type(1) {
+  inset-inline-start: 12%;
+  top: 4px;
 }
+
+.celebration i:nth-of-type(2) {
+  inset-inline-end: 12%;
+  top: 20px;
+  animation-delay: 120ms;
+}
+
+.celebration i:nth-of-type(3) {
+  inset-inline-start: 45%;
+  top: -12px;
+  animation-delay: 200ms;
+}
+
 .completion h2 {
-  font-family: inherit;
-  font-size: 33px;
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.5vh, 30px);
   font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.9px;
-  margin: 10px 0;
+  color: #1e3e25;
+  margin: 4px 0 6px;
+  letter-spacing: -0.4px;
 }
+
 .completion > p {
-  font-size: 17px;
-  line-height: 1.8;
-  color: var(--muted);
-  margin-bottom: 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #43664a;
+  margin: 0 0 16px;
 }
+
 .completion > button {
   width: 100%;
 }
-.completion > button:last-of-type {
-  margin-top: 6px;
-}
+
 .suggestion {
-  border-top: 1px solid #d3dec5;
-  margin-top: 20px;
-  padding-top: 12px;
+  margin-block-start: 14px;
+  padding-block-start: 10px;
+  border-block-start: 1.5px dashed #bcd9b8;
+  font-size: 13px;
+  color: #3b5c41;
 }
-.suggestion p {
-  font-size: 17px;
-  line-height: 1.8;
-}
+
 .suggestion small {
   display: block;
+  font-size: 12px;
   color: var(--muted);
-  font-size: 16px;
-  line-height: 1.8;
-  margin-top: 12px;
+  margin-block-start: 4px;
 }
-@keyframes bloom {
-  from {
-    opacity: 0;
-    transform: scale(0.75) rotate(-8deg);
+
+/* Accessibility helper */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Keyframe Animations
+   -------------------------------------------------------------------------- */
+@keyframes digitPop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.5;
   }
-  to {
+  100% {
+    transform: scale(1);
     opacity: 1;
-    transform: scale(1) rotate(0);
-  }
-}
-@media (max-width: 1050px) {
-  .gameLayout {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
-    gap: 20px;
-  }
-  .board {
-    padding: 23px;
-  }
-  .equation {
-    gap: 9px;
-    font-size: 30px;
-  }
-  .expression {
-    gap: 9px;
-  }
-  .solver {
-    padding: 24px;
-  }
-}
-@media (max-width: 760px) {
-  .mobileClue {
-    display: block;
-    background: white;
-    border: 1px solid #e0d6c1;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-top: 18px;
-  }
-  .mobileClue > span {
-    display: block;
-    font-size: 15px;
-    color: #746957;
-    margin-bottom: 8px;
-  }
-  .mobileClue .equation {
-    font-size: 28px;
-  }
-  .sideColumn {
-    display: contents;
-  }
-  .solver,
-  .completion {
-    grid-row: 1;
-  }
-  .board {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .sideColumn > section:last-child {
-    grid-column: 1;
-    grid-row: 3;
-  }
-  .game {
-    padding-top: 20px;
-  }
-  .gameHeading {
-    gap: 10px 18px;
-    margin-bottom: 20px;
-  }
-  .gameTheme {
-    margin-inline-start: auto;
-    font-size: 17px;
-  }
-  .progressDots {
-    justify-content: center;
-  }
-  .stepBadge {
-    margin-inline-start: 0;
-    width: 100%;
-    text-align: center;
-  }
-  .gameLayout {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  .board {
-    padding: 22px 18px;
-  }
-  .board h2 {
-    font-size: 17px;
-    margin: 12px 0 20px;
-  }
-  .clue {
-    padding: 14px 12px 17px;
-  }
-  .clueCaption {
-    font-size: 14px;
-    margin-bottom: 10px;
-  }
-  .equation {
-    font-size: clamp(22px, 6.7vw, 36px);
-    gap: 8px;
-  }
-  .expression {
-    gap: 8px;
-  }
-  .symbolShelf {
-    gap: 7px;
-    margin-top: 20px;
-    padding-top: 19px;
-  }
-  .symbolChip {
-    font-size: 21px;
-    padding: 7px 10px;
-    gap: 6px;
-  }
-  .sideColumn {
-    gap: 20px;
-  }
-  .solver {
-    padding: 18px;
-  }
-  .solver h2 {
-    font-size: 21px;
-  }
-  .completion {
-    padding: 30px 25px;
-  }
-}
-@media (max-width: 390px) {
-  .equation,
-  .expression {
-    gap: 6px;
-  }
-  .equation {
-    font-size: 23px;
-  }
-  .solver {
-    padding: 22px;
   }
 }
 
-.answerPrompt {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+@keyframes clueEnter {
+  0% {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
-.answerPrompt > span {
-  font-size: 42px;
+
+@keyframes solvedPop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes party {
+  0% {
+    transform: translateY(6px) scale(0.5);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px) rotate(80deg);
+    opacity: 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Responsive Layouts: Mobile, Tablet & Desktop Adaptations
+   -------------------------------------------------------------------------- */
+@media (max-width: 680px) {
+  .boardHeader {
+    gap: 6px;
+    margin-block-end: 4px;
+    padding-block-end: 4px;
+  }
+  .boardTheme {
+    font-size: 12px;
+    padding: 2px 8px;
+    gap: 4px;
+  }
+  .boardTheme > span:first-child {
+    font-size: 15px;
+  }
+  .stepBadge {
+    padding: 2px 8px;
+    font-size: 11px;
+    gap: 5px;
+  }
+  .progressDots > span {
+    width: 17px;
+    height: 17px;
+    font-size: 9.5px;
+  }
+
+  .gameLayout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 8px;
+    overflow-y: auto;
+  }
+
+  .solver,
+  .completion {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .board {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 8px 12px;
+    border-radius: 16px;
+    overflow-y: auto;
+  }
+
+  .targetHeading {
+    gap: 8px;
+    margin: 0 0 4px;
+  }
+
+  .targetCard .symbolToken {
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+  }
+
+  .targetEquals {
+    font-size: 22px;
+  }
+
+  .targetOutput {
+    min-width: 64px;
+    height: 38px;
+    min-height: 38px;
+    font-size: 22px;
+    padding: 0 8px;
+    border-radius: 12px;
+  }
+
+  .keypad {
+    gap: 4px;
+    margin: 4px 0;
+  }
+
+  .keypad button {
+    height: clamp(38px, 5.2vh, 46px);
+    min-height: 38px;
+    font-size: 19px;
+    border-radius: 10px;
+  }
+
+  .solverForm > button,
+  .solver form > button {
+    height: clamp(38px, 5.2vh, 46px);
+    min-height: 38px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+
+  .board h2 {
+    font-size: 14px;
+    margin: 0 0 4px;
+    padding-block-end: 4px;
+  }
+
+  .clues {
+    gap: 5px;
+  }
+
+  .clue {
+    padding: clamp(4px, 1vh, 8px) 10px;
+    border-radius: 12px;
+  }
+
+  .clueCaption {
+    font-size: 10px;
+    margin-block-end: 2px;
+  }
+
+  .equation {
+    font-size: clamp(18px, 2.8vh, 24px);
+    gap: 6px;
+  }
+
+  .symbolToken {
+    width: 28px;
+    height: 28px;
+    font-size: 17px;
+  }
+
+  .symbolShelf {
+    gap: 4px;
+    margin-block-start: 4px;
+    padding-block-start: 4px;
+  }
+
+  .symbolChip {
+    font-size: 12px;
+    padding: 2px 6px;
+  }
+
+  .symbolChip .symbolToken {
+    width: 22px;
+    height: 22px;
+    font-size: 13px;
+  }
+}
+
+@media (max-height: 520px) {
+  .boardHeader {
+    gap: 4px;
+    margin-block-end: 2px;
+    padding-block-end: 2px;
+  }
+  .targetHeading {
+    gap: 6px;
+    margin: 0 0 2px;
+  }
+  .targetCard .symbolToken {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+  }
+  .targetEquals {
+    font-size: 18px;
+  }
+  .targetOutput {
+    min-width: 56px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 20px;
+  }
+  .keypad {
+    gap: 3px;
+    margin: 2px 0;
+  }
+  .keypad button {
+    height: 32px;
+    min-height: 32px;
+    font-size: 16px;
+  }
+  .solverForm > button,
+  .solver form > button {
+    height: 32px;
+    min-height: 32px;
+    font-size: 13px;
+  }
+  .clues {
+    gap: 3px;
+  }
+  .clue {
+    padding: 2px 8px;
+  }
+  .equation {
+    font-size: 16px;
+    gap: 6px;
+  }
+  .symbolToken {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+  }
 }

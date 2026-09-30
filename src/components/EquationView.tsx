@@ -10,10 +10,12 @@ export function SymbolView({ puzzle, id, locale }: { puzzle: Puzzle; id: string;
   const theme = getTheme(puzzle.theme);
   const themeIndex = themes.findIndex((item) => item.id === puzzle.theme);
   return (
-    <Emoji
-      value={theme.emojis[index]!}
-      label={messages(locale).themeEmojiNames[themeIndex]![index]!}
-    />
+    <span className={styles.symbolToken}>
+      <Emoji
+        value={theme.emojis[index]!}
+        label={messages(locale).themeEmojiNames[themeIndex]![index]!}
+      />
+    </span>
   );
 }
 

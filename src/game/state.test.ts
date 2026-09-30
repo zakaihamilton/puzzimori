@@ -67,7 +67,13 @@ describe("game transitions", () => {
     const game = state.profiles[0]!.game;
     state = modelReducer(state, { type: "locale", locale: "he" });
     expect(state.profiles[0]!.game).toEqual(game);
+    expect(state.profiles[0]!.name).toBe("Ada");
     expect(state.profiles[1]).toEqual(initial.profiles[1]);
+    const defaultNamed = modelReducer(
+      { ...initial, profiles: [{ ...initial.profiles[0]!, name: "Explorer" }] },
+      { type: "locale", locale: "he" },
+    );
+    expect(defaultNamed.profiles[0]!.name).toBe("מגלה");
     state = modelReducer(state, { type: "select", id: "b" });
     expect(state).toMatchObject({ activeId: "b", locale: "he" });
   });

@@ -1,7 +1,7 @@
 import { themes } from "../engine/themes";
 import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
-import { DifficultyPicker } from "./DifficultyPicker";
+import { Companion } from "./Companion";
 import styles from "./Puzzimori.module.css";
 
 export function ThemeGallery({
@@ -9,13 +9,11 @@ export function ThemeGallery({
   locale,
   onTheme,
   onResume,
-  onDifficulty,
 }: {
   profile: Profile;
   locale: Locale;
   onTheme: (id: string) => void;
   onResume: () => void;
-  onDifficulty: (level: number) => void;
 }) {
   const m = messages(locale);
   const game = profile.game;
@@ -37,32 +35,18 @@ export function ThemeGallery({
           </button>
         </div>
       )}
-      <div className={styles.overview}>
-        <DifficultyPicker level={profile.difficulty} locale={locale} onChange={onDifficulty} />
-        <section className={styles.progressCard} aria-labelledby="discoveries-title">
-          <span className={styles.progressDecoration} aria-hidden="true">
-            ✦
-          </span>
-          <span className={styles.eyebrow} id="discoveries-title">
-            {m.progress}
-          </span>
-          <div className={styles.progressNumber}>
-            <strong aria-label={`${m.completedLabel}: ${profile.completed}`}>
-              {profile.completed.toString().padStart(2, "0")}
-            </strong>
-            <span aria-hidden="true">🌱</span>
-          </div>
-          <p>{m.discoveries}</p>
-        </section>
-      </div>
       <section className={styles.gallery} aria-labelledby="gallery-title">
         <div className={styles.sectionHeading}>
+          <Companion avatar={profile.avatar} />
           <div>
-            <h2 id="gallery-title">{m.chooseTheme}</h2>
+            <h1 id="gallery-title">{m.chooseTheme}</h1>
             <p>{m.themeIntro}</p>
           </div>
-          <span className={styles.worldCount} aria-hidden="true">
-            10 ✦
+          <span
+            className={styles.worldCount}
+            aria-label={`${m.completedLabel}: ${profile.completed}`}
+          >
+            🌟 {profile.completed}
           </span>
         </div>
         <div className={styles.themeGrid}>
@@ -74,17 +58,10 @@ export function ThemeGallery({
               onClick={() => onTheme(theme.id)}
               aria-label={`${m.play}: ${m.themeNames[index]}`}
             >
-              <span className={styles.themeNumber} aria-hidden="true">
-                {(index + 1).toString().padStart(2, "0")}
-              </span>
               <span className={styles.themeCover} aria-hidden="true">
                 {theme.cover}
               </span>
               <strong>{m.themeNames[index]}</strong>
-              <span className={styles.themeDescription}>{m.themeDescriptions[index]}</span>
-              <span className={styles.themeGo} aria-hidden="true">
-                ↗
-              </span>
             </button>
           ))}
         </div>

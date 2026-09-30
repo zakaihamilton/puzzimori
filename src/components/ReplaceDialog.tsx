@@ -28,6 +28,7 @@ export function ReplaceDialog({
   return (
     <dialog
       ref={ref}
+      id="replace-dialog"
       className={styles.dialog}
       aria-labelledby="replace-title"
       aria-describedby="replace-body"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { getDifficulty } from "../engine/difficulty";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
@@ -14,11 +14,16 @@ export function DifficultyPicker({
   onChange: (level: number) => void;
 }) {
   const [draft, setDraft] = useState({ base: level, value: level });
+  const sliderRef = useRef<HTMLInputElement>(null);
   const selected = draft.base === level ? draft.value : level;
-  function commit(value: number) {
+
+  function handleStartLevel() {
+    const chosen = selected;
+    sliderRef.current?.focus();
     setDraft({ base: level, value: level });
-    if (value !== level) onChange(value);
+    onChange(chosen);
   }
+
   const m = messages(locale);
   const spec = getDifficulty(selected);
   return (
@@ -36,6 +41,7 @@ export function DifficultyPicker({
         </div>
       </div>
       <input
+        ref={sliderRef}
         id="difficulty-slider"
         type="range"
         min={1}
@@ -44,24 +50,6 @@ export function DifficultyPicker({
         value={selected}
         aria-valuetext={`${m.level} ${selected}: ${m.difficultyNames[selected - 1]}`}
         onChange={(event) => setDraft({ base: level, value: Number(event.target.value) })}
-        onPointerUp={(event) => commit(Number(event.currentTarget.value))}
-        onPointerCancel={() => setDraft({ base: level, value: level })}
-        onKeyUp={(event) => {
-          if (
-            [
-              "ArrowLeft",
-              "ArrowRight",
-              "ArrowUp",
-              "ArrowDown",
-              "Home",
-              "End",
-              "PageUp",
-              "PageDown",
-            ].includes(event.key)
-          )
-            commit(Number(event.currentTarget.value));
-        }}
-        onBlur={(event) => commit(Number(event.currentTarget.value))}
       />
       <div className={styles.sliderNumbers} aria-hidden="true">
         <span>1</span>
@@ -79,6 +67,10 @@ export function DifficultyPicker({
           ))}
         </span>
       </div>
+      <button type="button" className={styles.startLevelButton} onClick={handleStartLevel}>
+        <span aria-hidden="true">▶</span>
+        <span>{`${m.startLevel} ${selected}`}</span>
+      </button>
     </section>
   );
 }
