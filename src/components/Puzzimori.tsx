@@ -23,6 +23,7 @@ export function Puzzimori() {
   const [notice, setNotice] = useState<"none" | "recovered" | "unavailable">("none");
   const [screen, setScreen] = useState<"profiles" | "themes" | "game">("game");
   const [pending, setPending] = useState<{ theme: string; level: number } | null>(null);
+  const [previewTheme, setPreviewTheme] = useState<string | undefined>(undefined);
   const profile = model.profiles.find((item) => item.id === model.activeId);
   const puzzleId = profile?.game?.puzzle.id;
   const m = messages(model.locale);
@@ -226,9 +227,19 @@ export function Puzzimori() {
             <div
               key={`${screen}-${model.activeId}`}
               className={styles.stage}
-              data-theme={screen === "game" ? profile?.game?.puzzle.theme : undefined}
+              data-theme={
+                screen === "game"
+                  ? profile?.game?.puzzle.theme
+                  : (previewTheme ?? profile?.game?.puzzle.theme ?? "crafting")
+              }
             >
-              <WorldScene theme={screen === "game" ? profile?.game?.puzzle.theme : undefined} />
+              <WorldScene
+                theme={
+                  screen === "game"
+                    ? profile?.game?.puzzle.theme
+                    : (previewTheme ?? profile?.game?.puzzle.theme ?? "crafting")
+                }
+              />
               {screen === "profiles" || !profile ? (
                 <ProfilePicker
                   profiles={model.profiles}
@@ -285,6 +296,7 @@ export function Puzzimori() {
                   locale={model.locale}
                   onTheme={(theme) => requestPuzzle(theme, profile.difficulty)}
                   onResume={() => setScreen("game")}
+                  onPreviewTheme={setPreviewTheme}
                 />
               )}
             </div>

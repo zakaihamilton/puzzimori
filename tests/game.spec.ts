@@ -366,3 +366,44 @@ test("persists animation preferences and respects reduced motion", async ({ page
   await solvePuzzle(page, "en");
   await expect(page.locator('[data-reaction="complete"]')).toBeVisible();
 });
+
+test("navigates worlds with showcase arrows and ribbon, displays preview emojis, and spotlights saved puzzle", async ({
+  page,
+}) => {
+  const m = messages("en");
+  await loadGame(page, "en");
+  // Open world select screen via brand button
+  await page.getByRole("button", { name: m.chooseTheme, exact: true }).click();
+  await expect(page.getByRole("heading", { name: m.chooseTheme })).toBeVisible();
+
+  // Initially shows crafting world (which has an unfinished puzzle from loadGame)
+  await expect(page.getByRole("heading", { name: m.themeNames[0]! })).toBeVisible();
+  await expect(page.getByRole("button", { name: m.resume, exact: true })).toBeVisible();
+
+  // Ribbon has 10 world tabs
+  const ribbonTabs = page.getByRole("tab");
+  await expect(ribbonTabs).toHaveCount(10);
+  await expect(ribbonTabs.first()).toHaveAttribute("aria-selected", "true");
+
+  // Click next world arrow
+  await page.getByRole("button", { name: m.nextWorld, exact: true }).click();
+  await expect(page.getByRole("heading", { name: m.themeNames[1]! })).toBeVisible();
+  await expect(ribbonTabs.nth(1)).toHaveAttribute("aria-selected", "true");
+  // Play button shown since world 1 is not the saved puzzle
+  await expect(page.getByRole("button", { name: m.play, exact: true })).toBeVisible();
+
+  // Click a world badge directly from the ribbon (e.g. world 4)
+  await ribbonTabs.nth(4).click();
+  await expect(page.getByRole("heading", { name: m.themeNames[4]! })).toBeVisible();
+  await expect(ribbonTabs.nth(4)).toHaveAttribute("aria-selected", "true");
+
+  // Verify preview emojis group is visible
+  const emojiGroup = page.getByRole("group", { name: m.themeNames[4]! });
+  await expect(emojiGroup).toBeVisible();
+
+  // Navigate back to world 0 via ribbon and resume
+  await ribbonTabs.first().click();
+  await expect(page.getByRole("button", { name: m.resume, exact: true })).toBeVisible();
+  await page.getByRole("button", { name: m.resume, exact: true }).click();
+  await expect(page.getByRole("heading", { name: m.findValue })).toBeVisible();
+});
