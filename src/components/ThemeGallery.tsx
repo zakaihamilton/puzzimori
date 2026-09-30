@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { themes } from "../engine/themes";
 import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
@@ -32,10 +32,8 @@ export function ThemeGallery({
     : 0;
 
   const [selectedIndex, setSelectedIndex] = useState(initialIndex);
-  const ribbonRef = useRef<HTMLDivElement>(null);
 
   const currentTheme = themes[selectedIndex]!;
-  const isSavedWorld = hasUnfinished && currentTheme.id === savedThemeId;
 
   useEffect(() => {
     onPreviewTheme?.(currentTheme.id);
@@ -71,15 +69,7 @@ export function ThemeGallery({
     }
   }
 
-  useEffect(() => {
-    const track = ribbonRef.current;
-    const activeBadge = track?.querySelector<HTMLElement>(`[data-active="true"]`);
-    if (track && activeBadge) {
-      const scrollLeft =
-        activeBadge.offsetLeft - track.offsetWidth / 2 + activeBadge.offsetWidth / 2;
-      track.scrollTo({ left: scrollLeft, behavior: "smooth" });
-    }
-  }, [selectedIndex]);
+  const total = themes.length;
 
   return (
     <section className={styles.gallery} aria-labelledby="gallery-title">
@@ -103,115 +93,154 @@ export function ThemeGallery({
         <button
           type="button"
           className={styles.showcaseNavButton}
+          data-direction="prev"
           onClick={locale === "he" ? handleNext : handlePrev}
           aria-label={m.previousWorld}
         >
           <span aria-hidden="true">{locale === "he" ? "→" : "←"}</span>
         </button>
 
-        <div key={currentTheme.id} className={styles.showcaseCard} data-color={currentTheme.color}>
-          {isSavedWorld && (
-            <div className={styles.spotlightSavedBadge}>
-              <span aria-hidden="true">🔖</span>
-              <span>
-                {m.resumeIntro} · {m.level} {game!.puzzle.difficulty}
-              </span>
-            </div>
-          )}
+        <div className={styles.showcaseReel}>
+          {themes.map((theme, index) => {
+            let delta = (((index - selectedIndex) % total) + total) % total;
+            if (delta > total / 2) {
+              delta -= total;
+            }
 
-          <div className={styles.showcaseCoverWrapper}>
-            <span className={styles.showcaseCover} aria-hidden="true">
-              <StoryIcon value={currentTheme.cover} size="0.95em" />
-            </span>
-          </div>
+            const visualDelta = locale === "he" ? -delta : delta;
 
-          <div className={styles.showcaseInfo}>
-            <h2 className={styles.showcaseTitle}>{m.themeNames[selectedIndex]}</h2>
-            <p className={styles.showcaseDescription}>{m.themeDescriptions[selectedIndex]}</p>
-          </div>
+            let position: "center" | "left" | "right" | "far-left" | "far-right" | "hidden";
+            if (visualDelta === 0) {
+              position = "center";
+            } else if (visualDelta === 1) {
+              position = "right";
+            } else if (visualDelta === -1) {
+              position = "left";
+            } else if (visualDelta === 2) {
+              position = "far-right";
+            } else if (visualDelta === -2) {
+              position = "far-left";
+            } else {
+              position = "hidden";
+            }
 
-          <div
-            className={styles.showcaseEmojiArc}
-            role="group"
-            aria-label={m.themeNames[selectedIndex]}
-          >
-            {currentTheme.emojis.map((emoji, emojiIndex) => (
-              <span
-                key={emoji}
-                className={styles.showcaseEmojiToken}
-                style={{ animationDelay: `${emojiIndex * 0.16}s` }}
-                title={m.themeEmojiNames[selectedIndex]![emojiIndex]!}
+            const isCenter = position === "center";
+            const isNeighbor = position === "left" || position === "right";
+            const isThemeSaved = hasUnfinished && game?.puzzle.theme === theme.id;
+            const isDecorative = !isCenter;
+
+            return (
+              <div
+                key={theme.id}
+                className={styles.showcaseCard}
+                data-position={position}
+                data-color={theme.color}
+                aria-hidden={!isCenter && !isNeighbor}
               >
-                <StoryIcon value={emoji} size="0.85em" />
-              </span>
-            ))}
-          </div>
+                {isNeighbor && (
+                  <button
+                    type="button"
+                    className={styles.showcaseCardOverlay}
+                    onClick={() => setSelectedIndex(index)}
+                    aria-label={`${m.play}: ${m.themeNames[index]}`}
+                  />
+                )}
 
-          {isSavedWorld ? (
-            <button
-              type="button"
-              className={styles.showcaseActionButton}
-              data-resume="true"
-              onClick={onResume}
-            >
-              <span aria-hidden="true">▶</span>
-              <span>{m.resume}</span>
-              <span aria-hidden="true">↗</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              className={styles.showcaseActionButton}
-              onClick={() => onTheme(currentTheme.id)}
-            >
-              <span aria-hidden="true">▶</span>
-              <span>{m.play}</span>
-              <span aria-hidden="true">↗</span>
-            </button>
-          )}
+                {isThemeSaved && (
+                  <div className={styles.spotlightSavedBadge}>
+                    <span aria-hidden="true">🔖</span>
+                    <span>
+                      {m.resumeIntro} · {m.level} {game!.puzzle.difficulty}
+                    </span>
+                  </div>
+                )}
+
+                <div className={styles.showcaseCoverWrapper}>
+                  <span className={styles.showcaseCover} aria-hidden="true">
+                    <StoryIcon value={theme.cover} size="0.95em" />
+                  </span>
+                </div>
+
+                <div
+                  className={styles.showcaseInfo}
+                  aria-hidden={isDecorative ? "true" : undefined}
+                >
+                  {isCenter ? (
+                    <h2 className={styles.showcaseTitle}>{m.themeNames[index]}</h2>
+                  ) : (
+                    <span className={styles.showcaseTitle}>{m.themeNames[index]}</span>
+                  )}
+                  <p className={styles.showcaseDescription}>{m.themeDescriptions[index]}</p>
+                  <div className={styles.showcaseMetaBadge} aria-hidden="true">
+                    <span>
+                      ⭐ {m.level} {profile.difficulty} ·{" "}
+                      {m.difficultyNames[profile.difficulty - 1]}
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  className={styles.showcaseEmojiArc}
+                  role={isCenter ? "group" : undefined}
+                  aria-label={isCenter ? m.themeNames[index] : undefined}
+                  aria-hidden={isDecorative ? "true" : undefined}
+                >
+                  {theme.emojis.map((emoji, emojiIndex) => (
+                    <span
+                      key={emoji}
+                      className={styles.showcaseEmojiToken}
+                      style={{ animationDelay: `${emojiIndex * 0.16}s` }}
+                      title={m.themeEmojiNames[index]![emojiIndex]!}
+                    >
+                      <StoryIcon value={emoji} size="0.85em" />
+                    </span>
+                  ))}
+                </div>
+
+                {isCenter ? (
+                  isThemeSaved ? (
+                    <button
+                      type="button"
+                      className={styles.showcaseActionButton}
+                      data-resume="true"
+                      onClick={onResume}
+                    >
+                      <span aria-hidden="true">▶</span>
+                      <span>{m.resume}</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className={styles.showcaseActionButton}
+                      onClick={() => onTheme(theme.id)}
+                    >
+                      <span aria-hidden="true">▶</span>
+                      <span>{m.play}</span>
+                      <span aria-hidden="true">↗</span>
+                    </button>
+                  )
+                ) : (
+                  <div className={styles.showcaseActionButton} aria-hidden="true">
+                    <span aria-hidden="true">▶</span>
+                    <span>{isThemeSaved ? m.resume : m.play}</span>
+                    <span aria-hidden="true">↗</span>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <button
           type="button"
           className={styles.showcaseNavButton}
+          data-direction="next"
           onClick={locale === "he" ? handlePrev : handleNext}
           aria-label={m.nextWorld}
         >
           <span aria-hidden="true">{locale === "he" ? "←" : "→"}</span>
         </button>
-      </div>
-
-      <div className={styles.ribbonContainer}>
-        <div
-          ref={ribbonRef}
-          className={styles.ribbonTrack}
-          role="tablist"
-          aria-label={m.chooseTheme}
-        >
-          {themes.map((theme, index) => {
-            const isSelected = index === selectedIndex;
-            const isThemeSaved = hasUnfinished && game?.puzzle.theme === theme.id;
-            return (
-              <button
-                key={theme.id}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                className={styles.ribbonBadge}
-                data-active={isSelected}
-                data-color={theme.color}
-                onClick={() => setSelectedIndex(index)}
-                aria-label={`${m.play}: ${m.themeNames[index]}`}
-              >
-                <span className={styles.ribbonCover} aria-hidden="true">
-                  <StoryIcon value={theme.cover} size="1em" />
-                  {isThemeSaved && <span className={styles.ribbonSavedDot} title={m.resume} />}
-                </span>
-                <span className={styles.ribbonName}>{m.themeNames[index]}</span>
-              </button>
-            );
-          })}
-        </div>
       </div>
     </section>
   );

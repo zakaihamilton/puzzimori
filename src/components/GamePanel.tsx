@@ -15,14 +15,12 @@ export function GamePanel({
   locale,
   onAction,
   onNext,
-  onBack,
   suspended,
 }: {
   profile: Profile;
   locale: Locale;
   onAction: (action: GameAction) => void;
   onNext: () => void;
-  onBack: () => void;
   suspended: boolean;
 }) {
   const game = profile.game!;

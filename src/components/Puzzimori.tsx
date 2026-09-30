@@ -152,16 +152,23 @@ export function Puzzimori() {
   }
   function requestPuzzle(theme: string, level: number) {
     const game = profile?.game;
-    if (game && game.step < game.puzzle.symbols.length && (game.attempts > 0 || game.hintsUsed > 0))
+    if (
+      game &&
+      game.step < game.puzzle.symbols.length &&
+      (game.attempts > 0 || game.hintsUsed > 0)
+    ) {
       setPending({ theme, level });
-    else {
+    } else {
       setMenuOpen(false);
       start(theme, level);
+      setScreen("game");
     }
   }
   function changeDifficulty(level: number) {
     if (!profile) return;
-    requestPuzzle(profile.game?.puzzle.theme ?? "crafting", level);
+    dispatch({ type: "difficulty", level });
+    const currentTheme = profile.game?.puzzle.theme ?? previewTheme ?? "crafting";
+    requestPuzzle(currentTheme, level);
   }
   function changeLocale(locale: Locale) {
     dispatch({ type: "locale", locale });
@@ -287,7 +294,6 @@ export function Puzzimori() {
                   locale={model.locale}
                   onAction={(action) => dispatch({ type: "game", action })}
                   onNext={() => start(profile.game!.puzzle.theme, profile.difficulty)}
-                  onBack={() => setScreen("themes")}
                   suspended={menuOpen || pending !== null}
                 />
               ) : (
@@ -320,11 +326,7 @@ export function Puzzimori() {
             setMenuOpen(false);
             setScreen("profiles");
           }}
-          onDifficulty={
-            screen === "game"
-              ? changeDifficulty
-              : (level) => dispatch({ type: "difficulty", level })
-          }
+          onDifficulty={changeDifficulty}
         />
       )}
       {pending && (
@@ -333,7 +335,9 @@ export function Puzzimori() {
           onCancel={() => setPending(null)}
           onConfirm={() => {
             setMenuOpen(false);
+            setPending(null);
             start(pending.theme, pending.level);
+            setScreen("game");
           }}
         />
       )}
