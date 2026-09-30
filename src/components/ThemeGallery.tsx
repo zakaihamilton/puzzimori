@@ -22,6 +22,21 @@ export function ThemeGallery({
   const hasUnfinished = game && game.step < game.puzzle.symbols.length;
   return (
     <>
+      {hasUnfinished && (
+        <div className={styles.resumeCard}>
+          <span aria-hidden="true">{profile.avatar}</span>
+          <div>
+            <strong>{m.resume}</strong>
+            <p>
+              {m.resumeIntro} · {m.level} {game.puzzle.difficulty}
+            </p>
+          </div>
+          <button className={styles.secondaryButton} onClick={onResume}>
+            {m.resume}
+            <span aria-hidden="true">↗</span>
+          </button>
+        </div>
+      )}
       <div className={styles.overview}>
         <DifficultyPicker level={profile.difficulty} locale={locale} onChange={onDifficulty} />
         <section className={styles.progressCard} aria-labelledby="discoveries-title">
@@ -40,21 +55,6 @@ export function ThemeGallery({
           <p>{m.discoveries}</p>
         </section>
       </div>
-      {hasUnfinished && (
-        <div className={styles.resumeCard}>
-          <span aria-hidden="true">{profile.avatar}</span>
-          <div>
-            <strong>{m.resume}</strong>
-            <p>
-              {m.resumeIntro} · {m.level} {game.puzzle.difficulty}
-            </p>
-          </div>
-          <button className={styles.secondaryButton} onClick={onResume}>
-            {m.resume}
-            <span aria-hidden="true">↗</span>
-          </button>
-        </div>
-      )}
       <section className={styles.gallery} aria-labelledby="gallery-title">
         <div className={styles.sectionHeading}>
           <div>

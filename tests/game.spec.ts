@@ -29,13 +29,19 @@ async function startPuzzle(page: Page, locale: Locale, difficulty = 1) {
     .toBe(difficulty);
 }
 
+async function enterAnswer(page: Page, locale: Locale, value: string) {
+  await page.getByLabel(messages(locale).answer, { exact: true }).focus();
+  await page.keyboard.press("Delete");
+  await page.keyboard.type(value);
+}
+
 async function solvePuzzle(page: Page, locale: Locale) {
   const m = messages(locale);
   const data = await saved(page);
   const profile = data.profiles.find((profile) => profile.id === data.activeId)!;
   const { puzzle, step } = profile.game!;
   for (const id of puzzle.symbols.slice(step)) {
-    await page.getByLabel(m.answer, { exact: true }).fill(String(puzzle.values[id]));
+    await enterAnswer(page, locale, String(puzzle.values[id]));
     await page.getByRole("button", { name: m.check, exact: true }).click();
   }
   await expect(page.getByRole("heading", { name: m.completionTitle })).toBeVisible();
@@ -68,14 +74,14 @@ for (const locale of ["en", "he"] as const) {
           path: testInfo.outputPath(`puzzimori-${locale}.png`),
           fullPage: true,
         });
-      await page.getByLabel(m.answer, { exact: true }).fill("abc");
+      await enterAnswer(page, locale, "abc");
       await page.getByRole("button", { name: m.check, exact: true }).click();
       await expect(page.locator("#feedback")).toHaveText(m.invalid);
-      await expect(page.getByLabel(m.answer, { exact: true })).toHaveValue("abc");
-      await page.getByLabel(m.answer, { exact: true }).fill("999");
+      await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("?");
+      await enterAnswer(page, locale, "999");
       await page.getByRole("button", { name: m.check, exact: true }).click();
       await expect(page.locator("#feedback")).toHaveText(m.incorrect);
-      await expect(page.getByLabel(m.answer, { exact: true })).toHaveValue("999");
+      await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("999");
       await page.getByRole("button", { name: m.hint, exact: true }).click();
       await expect(page.getByText(m.hintEquation, { exact: true })).toBeVisible();
       await page.getByRole("button", { name: m.moreHint, exact: true }).click();
@@ -97,7 +103,7 @@ test("cancels difficulty replacement and restores focus, then confirms a new puz
   const m = messages("en");
   await createExplorer(page);
   await startPuzzle(page, "en");
-  await page.getByLabel(m.answer, { exact: true }).fill("999");
+  await enterAnswer(page, "en", "999");
   await page.getByRole("button", { name: m.check, exact: true }).click();
   const original = (await saved(page)).profiles[0]!.game!;
   const slider = page.getByRole("slider", { name: m.difficulty });
@@ -126,7 +132,7 @@ test("preserves a partially solved puzzle through language change, reload, and p
   await createExplorer(page, "en", "Ada");
   await startPuzzle(page, "en");
   const initial = (await saved(page)).profiles[0]!.game!;
-  await page.getByLabel(en.answer, { exact: true }).fill(String(initial.puzzle.values.s0));
+  await enterAnswer(page, "en", String(initial.puzzle.values.s0));
   await page.getByRole("button", { name: en.check, exact: true }).click();
   await page.getByRole("button", { name: "עב", exact: true }).click();
   await expect(page.getByRole("heading", { name: he.findValue })).toBeVisible();
@@ -135,6 +141,7 @@ test("preserves a partially solved puzzle through language change, reload, and p
   await page.getByRole("button", { name: he.resume, exact: true }).click();
   expect((await saved(page)).profiles[0]!.game!.puzzle.id).toBe(initial.puzzle.id);
   await page.getByRole("button", { name: `${he.switchProfile}: Ada`, exact: true }).click();
+  await page.getByRole("button", { name: he.newProfile }).click();
   await page.getByLabel(he.name, { exact: true }).fill("Bea");
   await page.getByRole("button", { name: he.create, exact: true }).click();
   await page.getByRole("button", { name: `${he.play}: ${he.themeNames[1]}`, exact: true }).click();
@@ -150,18 +157,18 @@ test("supports keyboard answers, the number pad, and three-success suggestions",
   const m = messages("en");
   await createExplorer(page);
   await startPuzzle(page, "en");
-  await page.getByRole("button", { name: m.keypad }).click();
+  await expect(page.locator("#number-pad")).toBeVisible();
   await page.locator("#number-pad").getByRole("button", { name: "1", exact: true }).click();
   await page.locator("#number-pad").getByRole("button", { name: "2", exact: true }).click();
   await page.locator("#number-pad").getByRole("button", { name: m.erase, exact: true }).click();
-  await expect(page.getByLabel(m.answer, { exact: true })).toHaveValue("1");
+  await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("1");
   await page.locator("#number-pad").getByRole("button", { name: m.clear, exact: true }).click();
-  await expect(page.getByLabel(m.answer, { exact: true })).toHaveValue("");
+  await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("?");
   const puzzle = (await saved(page)).profiles[0]!.game!.puzzle;
   const digit = String(puzzle.values.s0);
   await page.locator("#number-pad").getByRole("button", { name: digit, exact: true }).click();
-  await expect(page.getByLabel(m.answer, { exact: true })).toHaveValue(digit);
-  await page.getByLabel(m.answer, { exact: true }).press("Enter");
+  await expect(page.getByLabel(m.answer, { exact: true })).toHaveText(digit);
+  await page.keyboard.press("Enter");
   await expect.poll(async () => (await saved(page)).profiles[0]!.game!.step).toBe(1);
   await solvePuzzle(page, "en");
   for (let i = 0; i < 2; i++) {
@@ -214,7 +221,7 @@ test("previews a slider drag and preserves the unfinished puzzle when selecting 
   await page.mouse.up();
   await expect(slider).toHaveValue("10");
   await startPuzzle(page, "en", 10);
-  await page.getByLabel(m.answer, { exact: true }).fill("999");
+  await enterAnswer(page, "en", "999");
   await page.getByRole("button", { name: m.check, exact: true }).click();
   const original = (await saved(page)).profiles[0]!.game!;
   await slider.scrollIntoViewIfNeeded();
@@ -238,4 +245,26 @@ test("previews a slider drag and preserves the unfinished puzzle when selecting 
   expect((await saved(page)).profiles[0]!.game).toEqual(original);
   await page.getByRole("button", { name: m.resume, exact: true }).click();
   await expect(slider).toHaveValue("10");
+});
+
+test("uses only a keypad and supports physical digit keys without opening a text input", async ({
+  page,
+}) => {
+  const m = messages("en");
+  await createExplorer(page);
+  await startPuzzle(page, "en");
+  await expect(page.locator('input:not([type="range"])')).toHaveCount(0);
+  await enterAnswer(page, "en", "12abc34");
+  await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("123");
+  await page.keyboard.press("Backspace");
+  await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("12");
+  await page.getByRole("button", { name: "עב", exact: true }).click();
+  await expect(page.getByLabel(messages("he").answer, { exact: true })).toHaveText("12");
+  await page.keyboard.press("Delete");
+  await expect(page.getByLabel(messages("he").answer, { exact: true })).toHaveText("?");
+  const puzzle = (await saved(page)).profiles[0]!.game!.puzzle;
+  await page.getByLabel(messages("he").answer, { exact: true }).focus();
+  await page.keyboard.type(String(puzzle.values.s0));
+  await page.keyboard.press("Enter");
+  await expect.poll(async () => (await saved(page)).profiles[0]!.game!.step).toBe(1);
 });

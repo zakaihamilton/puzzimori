@@ -1,16 +1,16 @@
 :root {
-  --paper: #faf9f5;
-  --ink: #253e35;
+  --paper: #f6f8ff;
+  --ink: #25314f;
   --muted: #677168;
   --line: #dedfd5;
-  --green: #35594a;
-  --green-dark: #244337;
-  --mint: #e2ede3;
+  --green: #5145a8;
+  --green-dark: #3d3287;
+  --mint: #e0f4e8;
   --peach: #f5e5d9;
-  --butter: #f3edcf;
+  --butter: #fff0b8;
   --rose: #f4e1e4;
-  --lavender: #e8e5f1;
-  --sky: #e1eaf0;
+  --lavender: #ece5ff;
+  --sky: #dff0ff;
 }
 * {
   box-sizing: border-box;

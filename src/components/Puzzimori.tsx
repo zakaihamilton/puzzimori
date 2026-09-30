@@ -108,23 +108,18 @@ export function Puzzimori() {
               Puzzimori<span className={styles.brandDot}>.</span>
             </span>
           </button>
-          <nav className={styles.nav} aria-label="Puzzimori">
-            <button
-              className={styles.navItem}
-              aria-current={screen === "profiles" ? "page" : undefined}
-              onClick={() => setScreen("profiles")}
-            >
-              {m.profiles}
-            </button>
-            <button
-              className={styles.navItem}
-              aria-current={screen !== "profiles" ? "page" : undefined}
-              disabled={!profile}
-              onClick={() => setScreen("themes")}
-            >
-              {m.themes}
-            </button>
-          </nav>
+          {screen !== "game" && (
+            <nav className={styles.nav} aria-label="Puzzimori">
+              <button
+                className={styles.navItem}
+                aria-current={screen !== "profiles" ? "page" : undefined}
+                disabled={!profile}
+                onClick={() => setScreen("themes")}
+              >
+                {m.themes}
+              </button>
+            </nav>
+          )}
           <div className={styles.headerControls}>
             <div className={styles.languageToggle} role="group" aria-label={m.language}>
               <button
@@ -168,7 +163,7 @@ export function Puzzimori() {
                 {m[notice]}
               </p>
             )}
-            {screen !== "game" && (
+            {screen === "profiles" && (
               <section className={styles.hero} aria-labelledby="hero-title">
                 <div className={styles.heroCopy}>
                   <span className={styles.eyebrow}>

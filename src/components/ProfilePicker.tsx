@@ -20,6 +20,7 @@ export function ProfilePicker({
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState<string>(avatars[0]);
   const [invalid, setInvalid] = useState(false);
+  const [showForm, setShowForm] = useState(profiles.length === 0);
   function submit(event: FormEvent) {
     event.preventDefault();
     if (!name.trim() || name.trim().length > 24) {
@@ -64,49 +65,57 @@ export function ProfilePicker({
             ))}
           </div>
         )}
-        <form className={styles.profileForm} onSubmit={submit} noValidate>
-          <span className={styles.eyebrow}>{m.newProfile}</span>
-          <label htmlFor="explorer-name">{m.name}</label>
-          <input
-            id="explorer-name"
-            value={name}
-            maxLength={24}
-            placeholder={m.namePlaceholder}
-            autoComplete="off"
-            onChange={(event) => {
-              setName(event.target.value);
-              setInvalid(false);
-            }}
-            aria-invalid={invalid}
-            aria-describedby={invalid ? "name-error" : undefined}
-          />
-          {invalid && (
-            <p id="name-error" role="alert" className={styles.error}>
-              {m.nameError}
-            </p>
-          )}
-          <fieldset className={styles.avatarPicker}>
-            <legend>{m.avatar}</legend>
-            <div className={styles.avatarGrid}>
-              {avatars.map((value, index) => (
-                <button
-                  key={value}
-                  type="button"
-                  aria-pressed={avatar === value}
-                  className={styles.avatarButton}
-                  onClick={() => setAvatar(value)}
-                >
-                  <Emoji value={value} label={m.avatarNames[index]!} />
-                </button>
-              ))}
-            </div>
-          </fieldset>
-          <button className={styles.primaryButton} type="submit" disabled={profiles.length >= 30}>
-            {m.create}
-            <span aria-hidden="true">↗</span>
+        {!showForm && (
+          <button className={styles.secondaryButton} onClick={() => setShowForm(true)}>
+            <span aria-hidden="true">＋</span>
+            {m.newProfile}
           </button>
-          {profiles.length >= 30 && <p className={styles.muted}>{m.profileLimit}</p>}
-        </form>
+        )}
+        {showForm && (
+          <form className={styles.profileForm} onSubmit={submit} noValidate>
+            <span className={styles.eyebrow}>{m.newProfile}</span>
+            <label htmlFor="explorer-name">{m.name}</label>
+            <input
+              id="explorer-name"
+              value={name}
+              maxLength={24}
+              placeholder={m.namePlaceholder}
+              autoComplete="off"
+              onChange={(event) => {
+                setName(event.target.value);
+                setInvalid(false);
+              }}
+              aria-invalid={invalid}
+              aria-describedby={invalid ? "name-error" : undefined}
+            />
+            {invalid && (
+              <p id="name-error" role="alert" className={styles.error}>
+                {m.nameError}
+              </p>
+            )}
+            <fieldset className={styles.avatarPicker}>
+              <legend>{m.avatar}</legend>
+              <div className={styles.avatarGrid}>
+                {avatars.map((value, index) => (
+                  <button
+                    key={value}
+                    type="button"
+                    aria-pressed={avatar === value}
+                    className={styles.avatarButton}
+                    onClick={() => setAvatar(value)}
+                  >
+                    <Emoji value={value} label={m.avatarNames[index]!} />
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <button className={styles.primaryButton} type="submit" disabled={profiles.length >= 30}>
+              {m.create}
+              <span aria-hidden="true">↗</span>
+            </button>
+            {profiles.length >= 30 && <p className={styles.muted}>{m.profileLimit}</p>}
+          </form>
+        )}
       </div>
     </section>
   );
