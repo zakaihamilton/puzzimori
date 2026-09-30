@@ -5,6 +5,8 @@ import type { GameAction, Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion, type Reaction } from "./Companion";
 import { EquationView, SymbolView } from "./EquationView";
+import { PapercraftConfetti } from "./PapercraftConfetti";
+import { StoryIcon } from "./StoryIcon";
 import styles from "./GamePanel.module.css";
 import ui from "./Puzzimori.module.css";
 
@@ -89,6 +91,7 @@ export function GamePanel({
   }
   return (
     <div className={styles.game}>
+      {complete && <PapercraftConfetti />}
       <div className={styles.gameLayout}>
         <div className={styles.sideColumn}>
           {complete ? (
@@ -196,7 +199,9 @@ export function GamePanel({
                 pulse={pulse}
               />
               <span className={styles.boardTheme}>
-                <span aria-hidden="true">{themes[themeIndex]!.cover}</span>
+                <span aria-hidden="true">
+                  <StoryIcon value={themes[themeIndex]!.cover} size="1.2em" />
+                </span>
                 {m.themeNames[themeIndex]}
               </span>
             </div>

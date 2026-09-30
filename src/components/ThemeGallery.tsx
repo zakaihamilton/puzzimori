@@ -3,6 +3,7 @@ import { themes } from "../engine/themes";
 import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion } from "./Companion";
+import { StoryIcon } from "./StoryIcon";
 import styles from "./Puzzimori.module.css";
 
 export function ThemeGallery({
@@ -120,7 +121,7 @@ export function ThemeGallery({
 
           <div className={styles.showcaseCoverWrapper}>
             <span className={styles.showcaseCover} aria-hidden="true">
-              {currentTheme.cover}
+              <StoryIcon value={currentTheme.cover} size="0.95em" />
             </span>
           </div>
 
@@ -141,7 +142,7 @@ export function ThemeGallery({
                 style={{ animationDelay: `${emojiIndex * 0.16}s` }}
                 title={m.themeEmojiNames[selectedIndex]![emojiIndex]!}
               >
-                {emoji}
+                <StoryIcon value={emoji} size="0.85em" />
               </span>
             ))}
           </div>
@@ -203,7 +204,7 @@ export function ThemeGallery({
                 aria-label={`${m.play}: ${m.themeNames[index]}`}
               >
                 <span className={styles.ribbonCover} aria-hidden="true">
-                  {theme.cover}
+                  <StoryIcon value={theme.cover} size="1em" />
                   {isThemeSaved && <span className={styles.ribbonSavedDot} title={m.resume} />}
                 </span>
                 <span className={styles.ribbonName}>{m.themeNames[index]}</span>
