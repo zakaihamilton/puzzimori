@@ -404,3 +404,49 @@ test("navigates worlds with showcase arrows and neighbor cards, displays preview
   await page.getByRole("button", { name: m.resume, exact: true }).click();
   await expect(page.getByRole("heading", { name: m.findValue })).toBeVisible();
 });
+
+for (const locale of ["en", "he"] as const) {
+  test(`renders every illustrated world with unique SVG references in ${locale}`, async ({
+    page,
+  }, testInfo) => {
+    const m = messages(locale);
+    await loadGame(page, locale);
+    await page.getByRole("button", { name: m.chooseTheme, exact: true }).click();
+    for (let index = 0; index < m.themeNames.length; index++) {
+      await expect(page.getByRole("heading", { name: m.themeNames[index]! })).toBeVisible();
+      const cover = page.locator('[data-position="center"] [data-world-art]');
+      await expect(cover).toBeVisible();
+      const motifs = page.locator("[data-scenery] [data-world-motif]");
+      await expect(motifs).toHaveCount(2);
+      const contained = await motifs.evaluateAll((nodes) =>
+        nodes.every((node) => {
+          const bounds = node.getBoundingClientRect();
+          const viewport = node.closest("svg")!.getBoundingClientRect();
+          return (
+            bounds.width > 0 &&
+            bounds.height > 0 &&
+            bounds.top >= viewport.top &&
+            bounds.bottom <= viewport.bottom &&
+            bounds.left >= viewport.left &&
+            bounds.right <= viewport.right
+          );
+        }),
+      );
+      expect(contained).toBe(true);
+      const ids = await page
+        .locator("svg [id]")
+        .evaluateAll((nodes) => nodes.map((node) => node.id));
+      expect(new Set(ids).size).toBe(ids.length);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+        true,
+      );
+      await page.screenshot({ path: testInfo.outputPath(`world-${index}-${locale}.png`) });
+      await page
+        .getByRole("button", { name: locale === "he" ? m.previousWorld : m.nextWorld, exact: true })
+        .click();
+    }
+    await page.setViewportSize({ width: 740, height: 360 });
+    await expect(page.getByRole("button", { name: m.resume, exact: true })).toBeInViewport();
+    await page.screenshot({ path: testInfo.outputPath(`landscape-${locale}.png`) });
+  });
+}

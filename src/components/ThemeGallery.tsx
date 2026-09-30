@@ -3,6 +3,7 @@ import { themes } from "../engine/themes";
 import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion } from "./Companion";
+import { WorldCover } from "./WorldArt";
 import { StoryIcon } from "./StoryIcon";
 import styles from "./Puzzimori.module.css";
 
@@ -157,7 +158,7 @@ export function ThemeGallery({
 
                 <div className={styles.showcaseCoverWrapper}>
                   <span className={styles.showcaseCover} aria-hidden="true">
-                    <StoryIcon value={theme.cover} size="0.95em" />
+                    <WorldCover theme={theme.id} />
                   </span>
                 </div>
 

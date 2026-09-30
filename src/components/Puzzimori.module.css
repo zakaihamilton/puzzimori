@@ -491,7 +491,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transform-style: preserve-3d;
+  transform-style: flat;
 }
 
 .showcaseCard {
@@ -538,6 +538,7 @@
   border: none;
   cursor: pointer;
   z-index: 20;
+
   padding: 0;
   margin: 0;
   border-radius: inherit;
@@ -575,7 +576,6 @@
 }
 
 .showcaseCard[data-position="left"]:hover {
-  transform: translate3d(-60%, 0, -40px) rotateY(16deg) scale(0.89);
   opacity: 0.9;
   filter: saturate(0.95);
   box-shadow:
@@ -593,7 +593,6 @@
 }
 
 .showcaseCard[data-position="right"]:hover {
-  transform: translate3d(60%, 0, -40px) rotateY(-16deg) scale(0.89);
   opacity: 0.9;
   filter: saturate(0.95);
   box-shadow:
@@ -693,16 +692,16 @@
 .showcaseCover {
   display: grid;
   place-items: center;
-  width: clamp(76px, 11vh, 108px);
-  height: clamp(76px, 11vh, 108px);
+  width: clamp(96px, 16vh, 144px);
+  height: clamp(96px, 16vh, 144px);
   font-size: clamp(46px, 7vh, 66px);
   line-height: 1;
   background: radial-gradient(circle, #ffffff 40%, #fbf5e8 100%);
-  border: 3px solid #dfcfb9;
+  border: 2px solid #dfcfb9;
   border-radius: 50%;
   box-shadow:
-    inset 0 3px 6px rgba(0, 0, 0, 0.06),
-    0 6px 18px rgba(78, 59, 36, 0.14);
+    0 2px 0 #e6dac6,
+    0 6px 16px rgba(78, 59, 36, 0.1);
   animation: coverFloat 3.2s ease-in-out infinite alternate;
 }
 

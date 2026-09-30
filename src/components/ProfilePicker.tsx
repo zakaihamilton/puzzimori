@@ -3,6 +3,7 @@ import type { Locale, Profile } from "../game/state";
 import { messages } from "../i18n/messages";
 import { avatars } from "../storage/profiles";
 import { Companion } from "./Companion";
+import { StoryIcon } from "./StoryIcon";
 import { Emoji } from "./Emoji";
 import styles from "./Puzzimori.module.css";
 
@@ -49,7 +50,7 @@ export function ProfilePicker({
                 onClick={() => onSelect(profile.id)}
               >
                 <span className={styles.profileAvatar} aria-hidden="true">
-                  {profile.avatar}
+                  <StoryIcon value={profile.avatar} size="1em" />
                 </span>
                 <span>
                   <strong>{profile.name}</strong>
