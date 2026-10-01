@@ -72,7 +72,7 @@ test("first page loads directly into gameplay without configuring a user or pick
   expect(data).not.toHaveProperty("profiles");
   expect(data).not.toHaveProperty("activeId");
   await openMenu(page);
-  await expect(page.locator("#menu-dialog button")).toHaveCount(4);
+  await expect(page.locator("#menu-dialog button:not([data-tooltip-trigger])")).toHaveCount(4);
   await closeMenu(page);
   expect(data.game).not.toBeNull();
 });
@@ -214,7 +214,7 @@ test("migrates the selected legacy puzzle and removes player identities", async 
   expect(await page.evaluate(() => localStorage.getItem("puzzimori.profiles.v1"))).toBeNull();
   await openMenu(page, "he");
   await expect(page.getByText("נועה", { exact: true })).toHaveCount(0);
-  await expect(page.locator("#menu-dialog button")).toHaveCount(4);
+  await expect(page.locator("#menu-dialog button:not([data-tooltip-trigger])")).toHaveCount(4);
   await closeMenu(page, "he");
   await page.reload();
   await expect(page.getByRole("heading", { name: messages("he").findValue })).toBeVisible();
@@ -491,5 +491,149 @@ for (const locale of ["en", "he"] as const) {
     await page.setViewportSize({ width: 740, height: 360 });
     await expect(page.getByRole("button", { name: m.resume, exact: true })).toBeInViewport();
     await page.screenshot({ path: testInfo.outputPath(`landscape-${locale}.png`) });
+  });
+}
+
+test("custom tooltips support hover, keyboard dismissal, and Hebrew", async ({ page }) => {
+  await loadGame(page);
+  const brand = page.getByRole("button", { name: messages("en").chooseTheme, exact: true });
+  await brand.hover();
+  await expect(page.getByRole("tooltip")).toHaveText(messages("en").chooseTheme);
+  await brand.focus();
+  await expect(brand).toHaveAttribute("aria-describedby", /.+/);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
+  await language(page, "en", "he");
+  await page.getByRole("button", { name: messages("he").chooseTheme, exact: true }).focus();
+  await expect(page.getByRole("tooltip")).toHaveText(messages("he").chooseTheme);
+});
+
+for (const locale of ["en", "he"] as const) {
+  test(`celebrates completion once and settles into a readable reward in ${locale}`, async ({
+    page,
+  }, testInfo) => {
+    await loadGame(page, locale);
+    await solvePuzzle(page, locale);
+    const completion = page.locator("[data-completion]");
+    const particles = page.locator("[data-confetti-piece]");
+    await expect(page.locator("#completion-title")).toBeFocused();
+    await expect(particles).toHaveCount(32);
+    const timings = await particles.evaluateAll((elements) =>
+      elements.flatMap((element) =>
+        element.getAnimations().map((animation) => {
+          const timing = animation.effect!.getTiming();
+          return {
+            iterations: timing.iterations,
+            end: Number(timing.duration) + (timing.delay ?? 0),
+          };
+        }),
+      ),
+    );
+    expect(timings).toHaveLength(32);
+    expect(timings.every(({ iterations, end }) => iterations === 1 && end <= 3000)).toBe(true);
+    await expect(page.getByRole("button", { name: messages(locale).nextPuzzle })).toBeEnabled();
+    await completion.evaluate((element) => {
+      for (const animation of element.getAnimations({ subtree: true })) {
+        animation.pause();
+        animation.currentTime = 500;
+      }
+    });
+    await page.screenshot({
+      path: testInfo.outputPath(`reward-burst-${locale}.png`),
+      fullPage: true,
+    });
+    await completion.evaluate((element) => {
+      for (const animation of element.getAnimations({ subtree: true })) animation.play();
+    });
+    await expect
+      .poll(() =>
+        completion.evaluate(
+          (element) =>
+            element.getAnimations({ subtree: true }).filter((a) => a.playState !== "finished")
+              .length,
+        ),
+      )
+      .toBe(0);
+    await expect(particles.first()).toHaveCSS("opacity", "0");
+    await expect(page.locator("[data-reward-star]")).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .locator('[data-reaction="complete"]')
+          .evaluate(
+            (element) =>
+              element.getAnimations({ subtree: true }).filter((a) => a.playState !== "finished")
+                .length,
+          ),
+      )
+      .toBe(0);
+    await page.screenshot({
+      path: testInfo.outputPath(`reward-settled-${locale}.png`),
+      fullPage: true,
+    });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    const otherLocale = locale === "en" ? "he" : "en";
+    await language(page, locale, otherLocale);
+    await expect(
+      page.getByRole("heading", { name: messages(otherLocale).completionTitle }),
+    ).toBeVisible();
+    expect(
+      await completion.evaluate((element) =>
+        element.getAnimations({ subtree: true }).every((a) => a.playState === "finished"),
+      ),
+    ).toBe(true);
+    await expect(particles.first()).toHaveCSS("opacity", "0");
+    await openMenu(page, otherLocale);
+    await page.getByRole("switch", { name: messages(otherLocale).animations }).uncheck();
+    await page.getByRole("switch", { name: messages(otherLocale).animations }).check();
+    await closeMenu(page, otherLocale);
+    await expect(page.locator("[data-confetti]")).toBeHidden();
+    await expect(page.locator("[data-reward-star]")).toHaveCSS("animation-name", "none");
+    await page.getByRole("button", { name: messages(otherLocale).nextPuzzle }).click();
+    await solvePuzzle(page, otherLocale);
+    await expect(page.locator("[data-confetti-piece]")).toHaveCount(32);
+    await expect(
+      page.getByRole("button", { name: messages(otherLocale).nextPuzzle }),
+    ).toBeEnabled();
+    await page.getByRole("button", { name: messages(otherLocale).nextPuzzle }).click();
+    await expect(
+      page.getByRole("heading", { name: messages(otherLocale).findValue }),
+    ).toBeVisible();
+    await expect(page.locator("[data-confetti]")).toHaveCount(0);
+  });
+}
+
+for (const mode of ["preference", "reduced-motion"] as const) {
+  test(`shows a static completion reward with ${mode}`, async ({ page }) => {
+    await loadGame(page);
+    if (mode === "preference") {
+      await openMenu(page);
+      await page.getByRole("switch", { name: messages("en").animations }).uncheck();
+      await closeMenu(page);
+      await page.reload();
+      await expect(page.getByRole("heading", { name: messages("en").findValue })).toBeVisible();
+    } else {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+    }
+    await solvePuzzle(page, "en");
+    await expect(page.locator("[data-reward-star]")).toBeVisible();
+    await expect(page.locator("[data-reward-star]")).toHaveCSS("animation-name", "none");
+    await expect(page.locator("[data-confetti]")).toBeHidden();
+    await expect(page.locator("[data-completion] > p")).toHaveCSS("opacity", "1");
+    await expect(page.locator('[data-reaction="complete"]')).toHaveCSS("animation-name", "none");
+    await expect(page.locator("#completion-title")).toBeFocused();
+    if (mode === "preference") {
+      await openMenu(page);
+      await page.getByRole("switch", { name: messages("en").animations }).check();
+      await closeMenu(page);
+    } else {
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+    }
+    await expect(page.locator("[data-reward-star]")).toHaveCSS("animation-name", "none");
+    await expect(page.locator("[data-confetti]")).toBeHidden();
+    await page.getByRole("button", { name: messages("en").nextPuzzle }).click();
+    await expect(page.getByRole("heading", { name: messages("en").findValue })).toBeVisible();
   });
 }

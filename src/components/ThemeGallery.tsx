@@ -1,3 +1,4 @@
+import { Tooltip } from "./Tooltip";
 import React, { useEffect, useRef, useState } from "react";
 import { themes } from "../engine/themes";
 import type { Locale, SavedData } from "../game/state";
@@ -187,14 +188,18 @@ export function ThemeGallery({
                   aria-hidden={isDecorative ? "true" : undefined}
                 >
                   {theme.emojis.map((emoji, emojiIndex) => (
-                    <span
+                    <Tooltip
                       key={emoji}
-                      className={styles.showcaseEmojiToken}
-                      style={{ animationDelay: `${emojiIndex * 0.16}s` }}
-                      title={m.themeEmojiNames[index]![emojiIndex]!}
+                      text={m.themeEmojiNames[index]![emojiIndex]!}
+                      focusable={isCenter}
                     >
-                      <StoryIcon value={emoji} size="0.85em" />
-                    </span>
+                      <span
+                        className={styles.showcaseEmojiToken}
+                        style={{ animationDelay: `${emojiIndex * 0.16}s` }}
+                      >
+                        <StoryIcon value={emoji} size="0.85em" />
+                      </span>
+                    </Tooltip>
                   ))}
                 </div>
 

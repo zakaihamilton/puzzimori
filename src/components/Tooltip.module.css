@@ -1,0 +1,37 @@
+.trigger {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.trigger:focus-visible {
+  outline: 3px solid #52775b;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.bubble {
+  position: absolute;
+  z-index: 100;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  padding-block: 10px;
+  padding-inline: 14px;
+  inline-size: max-content;
+  max-inline-size: min(240px, 70vw);
+  border: 1px solid #e2dccb;
+  border-radius: 12px;
+  background: #fffdf5;
+  color: #293d32;
+  box-shadow: 0 6px 20px #293d3226;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: start;
+  white-space: normal;
+}
