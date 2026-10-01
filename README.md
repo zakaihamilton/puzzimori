@@ -74,7 +74,7 @@ Subtraction is nonnegative and division has integer intermediate results. Each o
 - `src/i18n`: complete English/Hebrew messages, emoji labels, operation names, and hint strategies.
 - `src/components`: responsive screens and scoped styles. `src/app` supplies the server-rendered application shell and metadata.
 
-The generator accepts `{ seed, theme, difficulty, engineVersion: 1 }`. Reusing these options yields the same puzzle. Up to 32 generation attempts are checked for correctness before a validated constructive fallback. Preserve engine version 1 behavior when changing code; a new generation algorithm must receive a new persistence version or explicit migration.
+The generator accepts `{ seed, theme, difficulty, engineVersion }`. Reusing these options yields the same puzzle. Version 2 assigns a unique value to every emoji. Unfinished version 1 games restart as fresh version 2 puzzles while completed progress and settings carry over. Up to 32 generation attempts are checked for correctness before a validated constructive fallback. Preserve each engine version's behavior when changing code; a new generation algorithm must receive a new persistence version or explicit migration.
 
 The language switch sets page language and direction while mathematical expressions remain LTR. Native dialogs protect in-progress puzzles, restore focus, and support Escape. Reduced motion is respected. Keyboard answers, a number pad, emoji labels, and live feedback are included.
 

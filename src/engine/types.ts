@@ -26,7 +26,7 @@ export interface DifficultySpec {
 
 export interface Puzzle {
   id: string;
-  engineVersion: 1;
+  engineVersion: 1 | 2;
   seed: string;
   theme: string;
   difficulty: number;

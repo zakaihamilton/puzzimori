@@ -128,6 +128,8 @@ const en = {
   unavailable:
     "Your browser can’t save progress right now. You can keep playing, but this visit won’t be saved.",
   recovered: "Your saved progress couldn’t be read. A new adventure is ready.",
+  puzzleRestarted:
+    "Your unfinished puzzle was restarted with the new emoji number rule. Your completed puzzles are still saved.",
   localOnly: "A little world of learning, saved on this device.",
   footer: "Made for curious minds.",
   step: "Number",
@@ -276,6 +278,8 @@ const he: Messages = {
   cancel: "משאירים את החידה",
   unavailable: "הדפדפן לא יכול לשמור התקדמות כרגע. אפשר להמשיך לשחק, אבל הביקור הזה לא יישמר.",
   recovered: "לא הצלחנו לקרוא את ההתקדמות השמורה. הרפתקה חדשה מוכנה.",
+  puzzleRestarted:
+    "החידה שלא הושלמה התחילה מחדש לפי כלל המספרים החדש. החידות שהושלמו עדיין שמורות.",
   localOnly: "עולם קטן של למידה, שנשמר במכשיר הזה.",
   footer: "נוצר בשביל מוחות סקרנים.",
   step: "מספר",

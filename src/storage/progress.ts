@@ -43,8 +43,9 @@ function sameData(actual: unknown, expected: unknown): boolean {
 function parseGame(raw: unknown): GameState | null {
   if (!record(raw) || !record(raw.puzzle)) return null;
   const data = raw.puzzle;
+  const engineVersion = data.engineVersion;
   if (
-    data.engineVersion !== 1 ||
+    (engineVersion !== 1 && engineVersion !== 2) ||
     typeof data.seed !== "string" ||
     !data.seed ||
     data.seed.length > 120 ||
@@ -58,7 +59,7 @@ function parseGame(raw: unknown): GameState | null {
     seed: data.seed,
     theme: data.theme,
     difficulty: data.difficulty,
-    engineVersion: 1,
+    engineVersion,
   });
   if (!sameData(data, puzzle) || !integer(raw.step, puzzle.symbols.length) || !record(raw.solved))
     return null;
