@@ -7,7 +7,7 @@ import { themes } from "./themes";
 import type { Expression } from "./types";
 
 const generate = (difficulty: number, seed = "test") =>
-  generatePuzzle({ difficulty, seed, theme: "crafting", engineVersion: 1 });
+  generatePuzzle({ difficulty, seed, theme: "crafting", engineVersion: 2 });
 
 describe("procedural puzzle invariants", () => {
   for (let level = 1; level <= 10; level++) {
@@ -19,10 +19,11 @@ describe("procedural puzzle invariants", () => {
           seed: `invariant-${seed}`,
           theme: themes[seed % themes.length]!.id,
           difficulty: level,
-          engineVersion: 1,
+          engineVersion: 2,
         });
         expect(puzzle.symbols).toHaveLength(spec.symbolCount);
         expect(puzzle.equations).toHaveLength(spec.symbolCount);
+        expect(new Set(Object.values(puzzle.values)).size).toBe(spec.symbolCount);
         const solved: Record<string, number> = {};
         const operations = new Set<string>();
         for (const equation of puzzle.equations) {
@@ -68,12 +69,22 @@ describe("procedural puzzle invariants", () => {
   it("rejects bad configuration and corrupted puzzles", () => {
     for (const difficulty of [0, 11, 1.5, Number.NaN]) expect(() => generate(difficulty)).toThrow();
     expect(() =>
-      generatePuzzle({ seed: "x", theme: "missing", difficulty: 1, engineVersion: 1 }),
+      generatePuzzle({ seed: "x", theme: "missing", difficulty: 1, engineVersion: 2 }),
     ).toThrow();
     expect(() => generate(1, "")).toThrow();
     const puzzle = generate(10);
     expect(validatePuzzle(puzzle)).toBe(true);
     expect(validatePuzzle({ ...puzzle, values: { ...puzzle.values, s0: 0 } })).toBe(false);
+    const duplicateValues = { ...puzzle.values, s1: puzzle.values.s0! };
+    const duplicateAssignments = {
+      ...puzzle,
+      values: duplicateValues,
+      equations: puzzle.equations.map((equation) => ({
+        ...equation,
+        result: evaluate(equation.expression, duplicateValues),
+      })),
+    };
+    expect(validatePuzzle(duplicateAssignments)).toBe(false);
     expect(validatePuzzle({ ...puzzle, equations: puzzle.equations.toReversed() })).toBe(false);
     expect(validatePuzzle({ ...puzzle, symbols: ["s0", "s0"] })).toBe(false);
   });

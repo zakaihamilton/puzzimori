@@ -23,9 +23,17 @@ const binary = (op: Operator, left: Expression, right: Expression): Expression =
   right,
 });
 
-function construct(seed: string, theme: string, level: number, fallback = false): Puzzle {
+type EngineVersion = 1 | 2;
+
+function construct(
+  seed: string,
+  theme: string,
+  level: number,
+  fallback = false,
+  engineVersion: EngineVersion = 1,
+): Puzzle {
   const spec = getDifficulty(level);
-  const pick = fallback ? (min: number) => min : random(seed);
+  const pick = fallback ? (min: number, max: number) => Math.min(min, max) : random(seed);
   const symbols = getTheme(theme)
     .emojis.slice(0, spec.symbolCount)
     .map((_, index) => `s${index}`);
@@ -36,10 +44,44 @@ function construct(seed: string, theme: string, level: number, fallback = false)
         ? spec.maxFactor
         : spec.maxValue;
   const anchor = pick(level >= 6 ? 2 : 1, anchorMax);
-  const values: Record<string, number> = { s0: anchor };
-  for (const id of symbols.slice(1)) values[id] = pick(1, spec.maxValue);
-  if (level >= 6) values.s2 = pick(1, Math.min(spec.maxValue, Math.floor(spec.maxTotal / anchor)));
-  if (level >= 8) values.s3 = anchor * pick(2, Math.floor(spec.maxValue / anchor));
+  let values: Record<string, number>;
+  if (engineVersion === 1) {
+    // Preserve the version 1 seed contract for puzzles already saved by players.
+    values = { s0: anchor };
+    for (const id of symbols.slice(1)) values[id] = pick(1, spec.maxValue);
+    if (level >= 6)
+      values.s2 = pick(1, Math.min(spec.maxValue, Math.floor(spec.maxTotal / anchor)));
+    if (level >= 8) values.s3 = anchor * pick(2, Math.floor(spec.maxValue / anchor));
+  } else {
+    const availableValues = new Set<number>([anchor]);
+    const chooseUnique = (candidates: number[]) => {
+      const available = candidates.filter((value) => !availableValues.has(value));
+      if (available.length === 0) throw new Error("No unique variable value available");
+      const value = available[pick(0, available.length - 1)]!;
+      availableValues.add(value);
+      return value;
+    };
+    const range = (min: number, max: number) =>
+      Array.from({ length: max - min + 1 }, (_, index) => min + index);
+
+    values = { s0: anchor };
+    for (const id of symbols.slice(1)) {
+      if (id === "s2" && level >= 6) {
+        values[id] = chooseUnique(
+          range(1, Math.min(spec.maxValue, Math.floor(spec.maxTotal / anchor))),
+        );
+      } else if (id === "s3" && level >= 8) {
+        values[id] = chooseUnique(
+          Array.from(
+            { length: Math.floor(spec.maxValue / anchor) - 1 },
+            (_, index) => anchor * (index + 2),
+          ),
+        );
+      } else {
+        values[id] = chooseUnique(range(1, spec.maxValue));
+      }
+    }
+  }
   const equations: Equation[] = [];
   for (const [index, target] of symbols.entries()) {
     let expression: Expression;
@@ -87,8 +129,8 @@ function construct(seed: string, theme: string, level: number, fallback = false)
     });
   }
   return {
-    id: `v1:${theme}:${level}:${seed}`,
-    engineVersion: 1,
+    id: `v${engineVersion}:${theme}:${level}:${seed}`,
+    engineVersion,
     seed,
     theme,
     difficulty: level,
@@ -103,13 +145,18 @@ export function validatePuzzle(puzzle: Puzzle): boolean {
     const spec = getDifficulty(puzzle.difficulty);
     getTheme(puzzle.theme);
     if (
-      puzzle.engineVersion !== 1 ||
+      (puzzle.engineVersion !== 1 && puzzle.engineVersion !== 2) ||
       puzzle.symbols.length !== spec.symbolCount ||
       puzzle.equations.length !== spec.symbolCount ||
       new Set(puzzle.symbols).size !== spec.symbolCount
     )
       return false;
     if (Object.keys(puzzle.values).length !== spec.symbolCount) return false;
+    if (
+      puzzle.engineVersion === 2 &&
+      new Set(puzzle.symbols.map((id) => puzzle.values[id])).size !== spec.symbolCount
+    )
+      return false;
     const solved: Record<string, number> = {};
     const found = new Set<Operator>();
     for (const [index, equation] of puzzle.equations.entries()) {
@@ -156,20 +203,46 @@ export function generatePuzzle(options: {
   seed: string;
   theme: string;
   difficulty: number;
-  engineVersion: 1;
+  engineVersion: EngineVersion;
 }): Puzzle {
-  if (options.engineVersion !== 1 || !options.seed || options.seed.length > 120)
+  if (
+    (options.engineVersion !== 1 && options.engineVersion !== 2) ||
+    !options.seed ||
+    options.seed.length > 120
+  )
     throw new Error("Invalid engine options");
   getDifficulty(options.difficulty);
   getTheme(options.theme);
   for (let attempt = 0; attempt < 32; attempt++) {
-    const puzzle = construct(`${options.seed}:${attempt}`, options.theme, options.difficulty);
+    let puzzle: Puzzle;
+    try {
+      puzzle = construct(
+        `${options.seed}:${attempt}`,
+        options.theme,
+        options.difficulty,
+        false,
+        options.engineVersion,
+      );
+    } catch {
+      continue;
+    }
     // Persist the requested seed, so regeneration uses the same seed contract.
     puzzle.seed = options.seed;
-    puzzle.id = `v1:${options.theme}:${options.difficulty}:${options.seed}`;
+    puzzle.id = `v${options.engineVersion}:${options.theme}:${options.difficulty}:${options.seed}`;
     if (validatePuzzle(puzzle)) return puzzle;
   }
-  const fallback = construct(options.seed, options.theme, options.difficulty, true);
+  let fallback: Puzzle;
+  try {
+    fallback = construct(
+      options.seed,
+      options.theme,
+      options.difficulty,
+      true,
+      options.engineVersion,
+    );
+  } catch {
+    throw new Error("Puzzle construction failed");
+  }
   if (!validatePuzzle(fallback)) throw new Error("Puzzle construction failed");
   return fallback;
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { generatePuzzle } from "../engine/generator";
 import { gameReducer, modelReducer, newGame, type SavedData } from "./state";
 
-const puzzle = generatePuzzle({ seed: "state", theme: "garden", difficulty: 1, engineVersion: 1 });
+const puzzle = generatePuzzle({ seed: "state", theme: "garden", difficulty: 1, engineVersion: 2 });
 const initial: SavedData = {
   version: 2,
   locale: "en",

@@ -8,7 +8,7 @@ const puzzle = generatePuzzle({
   seed: "saved",
   theme: "kitchen",
   difficulty: 10,
-  engineVersion: 1,
+  engineVersion: 2,
 });
 const fixture: SavedData = {
   version: 2,
@@ -50,6 +50,24 @@ describe("versioned local progress", () => {
     expect(saveProgress(storage, fixture)).toBe(true);
     expect(loadProgress(storage)).toEqual({ data: fixture, notice: "none" });
     expect(loadProgress(memory()).data).toEqual(emptyData);
+  });
+  it("validates unfinished version 1 puzzles for the app to restart", () => {
+    const oldPuzzle = generatePuzzle({
+      seed: "saved-v1",
+      theme: "kitchen",
+      difficulty: 10,
+      engineVersion: 1,
+    });
+    const oldFixture: SavedData = {
+      ...fixture,
+      game: gameReducer(newGame(oldPuzzle), {
+        type: "attempt",
+        answer: String(oldPuzzle.values.s0),
+      }),
+    };
+    const storage = memory();
+    expect(saveProgress(storage, oldFixture)).toBe(true);
+    expect(loadProgress(storage)).toEqual({ data: oldFixture, notice: "none" });
   });
   it("handles malformed, oversized, empty, and unsupported saves safely", () => {
     for (const raw of [

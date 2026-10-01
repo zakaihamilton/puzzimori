@@ -168,13 +168,18 @@ test("preserves a partially solved puzzle through language change and reload", a
   expect((await saved(page)).game!.step).toBe(1);
 });
 
-test("migrates the selected legacy puzzle and removes player identities", async ({ page }) => {
-  const puzzle = generatePuzzle({
-    seed: "migration",
-    theme: "kitchen",
-    difficulty: 10,
-    engineVersion: 1,
-  });
+test("restarts an unfinished legacy puzzle with unique values and removes player identities", async ({
+  page,
+}) => {
+  const puzzle = Array.from({ length: 100 }, (_, index) =>
+    generatePuzzle({
+      seed: `migration-${index}`,
+      theme: "kitchen",
+      difficulty: 10,
+      engineVersion: 1,
+    }),
+  ).find((candidate) => new Set(Object.values(candidate.values)).size < candidate.symbols.length)!;
+  expect(new Set(Object.values(puzzle.values)).size).toBeLessThan(puzzle.symbols.length);
   const game = gameReducer(newGame(puzzle), { type: "attempt", answer: String(puzzle.values.s0) });
   const legacy = {
     version: 1,
@@ -209,17 +214,35 @@ test("migrates the selected legacy puzzle and removes player identities", async 
   }, legacy);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: messages("he").findValue })).toBeVisible();
-  await expect
-    .poll(() => saved(page))
-    .toEqual({ version: 2, locale: "he", difficulty: 10, completed: 4, streak: 2, game });
+  await expect(page.getByText(messages("he").puzzleRestarted)).toBeVisible();
+  const migrated = await saved(page);
+  expect(migrated).toMatchObject({
+    version: 2,
+    locale: "he",
+    difficulty: 10,
+    completed: 4,
+    streak: 2,
+  });
+  expect(migrated.game!.puzzle).toMatchObject({
+    engineVersion: 2,
+    theme: "kitchen",
+    difficulty: 10,
+  });
+  expect(migrated.game!.puzzle.id).not.toBe(game.puzzle.id);
+  expect(migrated.game!.step).toBe(0);
+  expect(migrated.game!.attempts).toBe(0);
+  expect(new Set(Object.values(migrated.game!.puzzle.values)).size).toBe(
+    migrated.game!.puzzle.symbols.length,
+  );
   expect(await page.evaluate(() => localStorage.getItem("puzzimori.profiles.v1"))).toBeNull();
   await openMenu(page, "he");
   await expect(page.getByText("נועה", { exact: true })).toHaveCount(0);
   await expect(page.locator("#menu-dialog button:not([data-tooltip-trigger])")).toHaveCount(4);
   await closeMenu(page, "he");
+  const restartedGame = migrated.game;
   await page.reload();
   await expect(page.getByRole("heading", { name: messages("he").findValue })).toBeVisible();
-  expect((await saved(page)).game).toEqual(game);
+  expect((await saved(page)).game).toEqual(restartedGame);
 });
 
 test("supports keyboard answers, the number pad, and three-success suggestions", async ({

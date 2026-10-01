@@ -20,7 +20,9 @@ export function Puzzimori() {
   const [animations, setAnimations] = useState(true);
   const [visible, setVisible] = useState(true);
   const [ready, setReady] = useState(false);
-  const [notice, setNotice] = useState<"none" | "recovered" | "unavailable">("none");
+  const [notice, setNotice] = useState<"none" | "recovered" | "unavailable" | "puzzleRestarted">(
+    "none",
+  );
   const [screen, setScreen] = useState<"themes" | "game">("game");
   const [pending, setPending] = useState<{ theme: string; level: number } | null>(null);
   const [previewTheme, setPreviewTheme] = useState<string | undefined>(undefined);
@@ -44,6 +46,27 @@ export function Puzzimori() {
         loaded = { data: emptyData, notice: "unavailable" };
       }
       let activeData = loaded.data;
+      let progressNotice: typeof notice = loaded.notice;
+      const savedGame = activeData.game;
+      if (
+        savedGame &&
+        savedGame.step < savedGame.puzzle.symbols.length &&
+        savedGame.puzzle.engineVersion === 1
+      ) {
+        activeData = {
+          ...activeData,
+          difficulty: savedGame.puzzle.difficulty,
+          game: newGame(
+            generatePuzzle({
+              seed: crypto.randomUUID(),
+              theme: savedGame.puzzle.theme,
+              difficulty: savedGame.puzzle.difficulty,
+              engineVersion: 2,
+            }),
+          ),
+        };
+        progressNotice = "puzzleRestarted";
+      }
       if (!activeData.game || activeData.game.step >= activeData.game.puzzle.symbols.length) {
         activeData = {
           ...activeData,
@@ -52,13 +75,13 @@ export function Puzzimori() {
               seed: crypto.randomUUID(),
               theme: activeData.game?.puzzle.theme ?? "crafting",
               difficulty: activeData.difficulty,
-              engineVersion: 1,
+              engineVersion: 2,
             }),
           ),
         };
       }
       dispatch({ type: "hydrate", data: activeData });
-      setNotice(loaded.notice);
+      setNotice(progressNotice);
       setScreen("game");
       setReady(true);
     });
@@ -109,7 +132,7 @@ export function Puzzimori() {
         seed: crypto.randomUUID(),
         theme,
         difficulty: level,
-        engineVersion: 1,
+        engineVersion: 2,
       }),
     });
     setPending(null);
