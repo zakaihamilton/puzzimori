@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { getDifficulty } from "../engine/difficulty";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
+import { Tooltip } from "./Tooltip";
 import styles from "./Puzzimori.module.css";
 
 export function DifficultyPicker({
@@ -60,10 +61,12 @@ export function DifficultyPicker({
         <strong>{m.difficultyNames[selected - 1]}</strong>
         <span className={styles.operations}>
           {spec.operations.map((operation, index) => (
-            <span key={operation} title={m.operationLabels[index]}>
-              {operation}
-              <span className={styles.operationText}>{m.operationShort[index]}</span>
-            </span>
+            <Tooltip key={operation} text={m.operationLabels[index]!} focusable>
+              <span>
+                {operation}
+                <span className={styles.operationText}>{m.operationShort[index]}</span>
+              </span>
+            </Tooltip>
           ))}
         </span>
       </div>

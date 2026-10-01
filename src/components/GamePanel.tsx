@@ -16,12 +16,14 @@ export function GamePanel({
   onAction,
   onNext,
   suspended,
+  animations,
 }: {
   progress: SavedData;
   locale: Locale;
   onAction: (action: GameAction) => void;
   onNext: () => void;
   suspended: boolean;
+  animations: boolean;
 }) {
   const game = progress.game!;
   const { puzzle } = game;
@@ -29,11 +31,29 @@ export function GamePanel({
   const equation = puzzle.equations[game.step];
   const complete = !equation;
   const [reaction, setReaction] = useState<Reaction>("idle");
+  const [celebrationFinished, setCelebrationFinished] = useState(false);
+  const celebrate = complete && reaction === "correct" && !celebrationFinished;
   const [pulse, setPulse] = useState(0);
   const [answer, setAnswer] = useState("");
   const answerRef = useRef<HTMLOutputElement>(null);
   const completionRef = useRef<HTMLHeadingElement>(null);
   const themeIndex = themes.findIndex((theme) => theme.id === puzzle.theme);
+  useEffect(() => {
+    if (!complete) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finish = () => setCelebrationFinished(true);
+    if (!animations || reducedMotion.matches) Promise.resolve().then(finish);
+    const stopForReducedMotion = (event: MediaQueryListEvent) => {
+      if (event.matches) finish();
+    };
+    const timer = window.setTimeout(finish, 3000);
+    reducedMotion.addEventListener("change", stopForReducedMotion);
+    return () => {
+      window.clearTimeout(timer);
+      reducedMotion.removeEventListener("change", stopForReducedMotion);
+    };
+  }, [complete, animations]);
+
   useEffect(() => {
     if (complete) completionRef.current?.focus();
     else answerRef.current?.focus();
@@ -88,17 +108,45 @@ export function GamePanel({
     answerRef.current?.focus();
   }
   return (
-    <div className={styles.game}>
-      {complete && <PapercraftConfetti />}
+    <div className={styles.game} data-celebrate={celebrate}>
       <div className={styles.gameLayout}>
         <div className={styles.sideColumn}>
           {complete ? (
-            <section className={styles.completion} aria-labelledby="completion-title">
+            <section
+              className={styles.completion}
+              aria-labelledby="completion-title"
+              data-completion
+            >
+              {complete && reaction === "correct" && <PapercraftConfetti />}
               <div className={styles.celebration} aria-hidden="true">
-                <span>✦</span>🌟<span>✧</span>
-                <i>✦</i>
-                <i>✧</i>
-                <i>✦</i>
+                <svg
+                  className={styles.rewardStar}
+                  data-reward-star
+                  viewBox="0 0 120 120"
+                  fill="none"
+                >
+                  <path
+                    d="M60 8 75 40 110 45 85 70 91 106 60 89 29 106 35 70 10 45 45 40Z"
+                    fill="#f2be4a"
+                    stroke="#c88a2c"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                  <path d="M60 8 60 60 45 40Z" fill="#fff0ad" />
+                  <path d="M60 60 75 40 110 45Z" fill="#ffdc78" />
+                  <path d="M60 60 85 70 91 106Z" fill="#d99930" />
+                  <path d="M60 60 60 89 29 106Z" fill="#e5aa37" />
+                  <path d="M60 60 35 70 10 45Z" fill="#ffe69a" />
+                  <path
+                    d="M60 8 60 60 110 45M60 60 91 106M60 60 29 106M60 60 10 45"
+                    stroke="#fff7d4"
+                    strokeOpacity="0.4"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <i className={styles.rewardSparkle}>✦</i>
+                <i className={styles.rewardSparkle}>✧</i>
+                <i className={styles.rewardSparkle}>✦</i>
               </div>
               <span className={ui.eyebrow}>{m.complete}</span>
               <h2 ref={completionRef} id="completion-title" tabIndex={-1}>
@@ -120,7 +168,7 @@ export function GamePanel({
             <section className={styles.solver} aria-labelledby="solver-title">
               <form onSubmit={submit} noValidate className={styles.solverForm}>
                 <div className={styles.solverPrompt}>{m.findValue}</div>
-                <h2 id="solver-title" className={styles.targetHeading} title={m.findValue}>
+                <h2 id="solver-title" className={styles.targetHeading}>
                   <span className={styles.srOnly}>{m.findValue}</span>
                   <span className={styles.targetCard} aria-hidden="true">
                     <SymbolView puzzle={puzzle} id={equation.target} locale={locale} />

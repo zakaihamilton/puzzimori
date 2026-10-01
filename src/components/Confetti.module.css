@@ -1,36 +1,71 @@
 .confettiContainer {
+  --confetti-direction: 1;
   position: absolute;
   inset: 0;
+  container-type: size;
   pointer-events: none;
   overflow: hidden;
-  z-index: 15;
+  border-radius: inherit;
+  z-index: 2;
+}
+
+.confettiContainer:dir(rtl) {
+  --confetti-direction: -1;
 }
 
 .confettiPiece {
   position: absolute;
-  top: -30px;
-  left: var(--confetti-left, 50%);
+  inset-block-start: 70%;
+  inset-inline-start: var(--confetti-origin);
   display: block;
   opacity: 0;
-  animation: confettiFall var(--confetti-duration, 3s) cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
-  animation-delay: var(--confetti-delay, 0s);
-  filter: drop-shadow(0 2px 4px rgba(78, 59, 36, 0.15));
+  animation: confettiBurst var(--confetti-duration) linear both;
+  animation-delay: var(--confetti-delay);
+  filter: drop-shadow(0 2px 2px #4e3b3626);
 }
 
-@keyframes confettiFall {
+@keyframes confettiBurst {
   0% {
-    transform: translateY(0) rotate(0deg) scale(0.8);
+    transform: translate(0, 0) rotate(0deg) scale(0.6);
     opacity: 0;
   }
-  15% {
+  8% {
     opacity: 1;
-    transform: translateY(30px) rotate(60deg) scale(1.05);
   }
-  75% {
-    opacity: 0.95;
+  35% {
+    transform: translate(
+        calc(var(--confetti-travel) * var(--confetti-direction) * 0.55),
+        var(--confetti-rise)
+      )
+      rotate(180deg) scale(1);
+    opacity: 1;
+  }
+  65% {
+    transform: translate(
+        calc(var(--confetti-travel) * var(--confetti-direction) * 0.8),
+        calc(var(--confetti-rise) * 0.65)
+      )
+      rotate(340deg) scale(0.9);
+    opacity: 0.85;
   }
   100% {
-    transform: translateY(calc(100vh + 50px)) rotate(680deg) scale(0.6);
+    transform: translate(calc(var(--confetti-travel) * var(--confetti-direction)), 40cqh)
+      rotate(540deg) scale(0.65);
     opacity: 0;
   }
+}
+
+:global([data-celebrate="false"]) .confettiContainer,
+:global([data-motion="off"]) .confettiContainer {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confettiContainer {
+    display: none;
+  }
+}
+
+:global([data-celebrate="false"]) .confettiPiece {
+  animation: none;
 }

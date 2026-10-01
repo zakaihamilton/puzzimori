@@ -5,7 +5,9 @@ interface ConfettiPiece {
   id: number;
   type: "star" | "ribbon" | "flake" | "petal";
   color: string;
-  left: number; // percentage 5 - 95
+  side: number;
+  travel: number;
+  rise: number;
   delay: number; // seconds
   duration: number; // seconds
   size: number; // pixels
@@ -22,34 +24,39 @@ const COLORS = [
   "#52b788", // meadow green
 ];
 
-const PIECES: ConfettiPiece[] = Array.from({ length: 24 }, (_, i) => {
+const PIECES: ConfettiPiece[] = Array.from({ length: 32 }, (_, i) => {
   const types: ConfettiPiece["type"][] = ["star", "ribbon", "flake", "petal"];
   return {
     id: i,
     type: types[i % types.length]!,
     color: COLORS[i % COLORS.length]!,
-    left: Math.round(((i * 4.1 + 7) % 90) + 5),
-    delay: Math.round(((i * 0.17) % 2.2) * 100) / 100,
-    duration: 2.4 + ((i * 0.23) % 1.6),
-    size: 14 + (i % 4) * 4,
+    side: i % 2 === 0 ? 6 : 94,
+    travel: (i % 2 === 0 ? 1 : -1) * (18 + ((i * 13) % 62)),
+    rise: 28 + ((i * 7) % 38),
+    delay: 0.15 + (i % 8) * 0.035,
+    duration: 2.1 + (i % 5) * 0.1,
+    size: 8 + (i % 4) * 3,
   };
 });
 
 export function PapercraftConfetti() {
   return (
-    <div className={styles.confettiContainer} aria-hidden="true">
+    <div className={styles.confettiContainer} aria-hidden="true" data-confetti>
       {PIECES.map((piece) => (
         <span
           key={piece.id}
           className={styles.confettiPiece}
+          data-confetti-piece
           style={
             {
-              "--confetti-left": `${piece.left}%`,
+              "--confetti-origin": `${piece.side}%`,
+              "--confetti-travel": `${piece.travel}cqw`,
+              "--confetti-rise": `${-piece.rise}cqh`,
               "--confetti-delay": `${piece.delay}s`,
               "--confetti-duration": `${piece.duration}s`,
-              "--confetti-color": piece.color,
-              width: `${piece.size}px`,
-              height: `${piece.size}px`,
+
+              inlineSize: `${piece.size}px`,
+              blockSize: `${piece.size}px`,
             } as React.CSSProperties
           }
         >

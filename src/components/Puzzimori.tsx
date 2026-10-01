@@ -6,6 +6,7 @@ import { modelReducer, newGame, type Locale } from "../game/state";
 import { messages } from "../i18n/messages";
 import { emptyData, loadProgress, saveProgress } from "../storage/progress";
 import { loadAnimations, saveAnimations } from "../storage/preferences";
+import { Tooltip } from "./Tooltip";
 import { MenuDialog } from "./MenuDialog";
 import { WorldScene } from "./WorldScene";
 import { GamePanel } from "./GamePanel";
@@ -141,25 +142,26 @@ export function Puzzimori() {
         {m.skip}
       </a>
       <header className={styles.floatingHeader}>
-        <button
-          type="button"
-          className={styles.floatingBrand}
-          onClick={() => {
-            if (ready) setScreen("themes");
-          }}
-          aria-label={m.chooseTheme}
-          title={m.chooseTheme}
-        >
-          <span className={styles.brandMark} aria-hidden="true">
-            <i />
-            <i />
-            <i />
-            <i />
-          </span>
-          <span dir="ltr">
-            Puzzimori<span className={styles.brandDot}>.</span>
-          </span>
-        </button>
+        <Tooltip text={m.chooseTheme}>
+          <button
+            type="button"
+            className={styles.floatingBrand}
+            onClick={() => {
+              if (ready) setScreen("themes");
+            }}
+            aria-label={m.chooseTheme}
+          >
+            <span className={styles.brandMark} aria-hidden="true">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
+            <span dir="ltr">
+              Puzzimori<span className={styles.brandDot}>.</span>
+            </span>
+          </button>
+        </Tooltip>
         <div className={styles.floatingControls}>
           <button
             className={styles.floatingButton}
@@ -210,6 +212,7 @@ export function Puzzimori() {
                   onAction={(action) => dispatch({ type: "game", action })}
                   onNext={() => start(model.game!.puzzle.theme, model.difficulty)}
                   suspended={menuOpen || pending !== null}
+                  animations={animations}
                 />
               ) : (
                 <ThemeGallery

@@ -629,6 +629,8 @@
    Completion / Celebration Scroll
    -------------------------------------------------------------------------- */
 .completion {
+  position: relative;
+  isolation: isolate;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -645,43 +647,92 @@
 }
 
 .celebration {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 42px;
-  margin: 0 0 10px;
+  display: grid;
+  place-items: center;
   position: relative;
+  inline-size: clamp(80px, 14vh, 132px);
+  block-size: clamp(80px, 14vh, 132px);
+  margin-block: 0 10px;
+  margin-inline: auto;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffe4a980 0%, #ffe4a930 45%, transparent 70%);
 }
 
-.celebration span {
-  font-size: 20px;
-  color: var(--gold);
+.rewardStar {
+  inline-size: 85%;
+  block-size: 85%;
+  filter: drop-shadow(0 5px 2px #a8762426);
 }
 
-.celebration i {
+:global([data-celebrate="true"]) .rewardStar {
+  animation: rewardReveal 550ms ease-out both;
+}
+
+.rewardSparkle {
   position: absolute;
-  font-size: 16px;
+  opacity: 0;
+  font-size: 20px;
   font-style: normal;
   color: var(--gold);
-  animation: party 1.4s ease-out both;
 }
 
-.celebration i:nth-of-type(1) {
-  inset-inline-start: 12%;
-  top: 4px;
+:global([data-celebrate="true"]) .rewardSparkle {
+  animation: party 900ms ease-out both;
+  animation-delay: 250ms;
 }
 
-.celebration i:nth-of-type(2) {
-  inset-inline-end: 12%;
-  top: 20px;
-  animation-delay: 120ms;
+.rewardSparkle:nth-of-type(1) {
+  inset-inline-start: -2%;
+  inset-block-start: 35%;
 }
 
-.celebration i:nth-of-type(3) {
-  inset-inline-start: 45%;
-  top: -12px;
-  animation-delay: 200ms;
+.rewardSparkle:nth-of-type(2) {
+  inset-inline-end: -2%;
+  inset-block-start: 55%;
+  animation-delay: 400ms;
+}
+
+.rewardSparkle:nth-of-type(3) {
+  inset-inline-start: 55%;
+  inset-block-start: 5%;
+  animation-delay: 550ms;
+}
+
+:global([data-celebrate="true"]) .completion > :is(span, h2, p) {
+  animation: completionText 300ms ease-out 200ms both;
+}
+
+@keyframes rewardReveal {
+  0% {
+    transform: scale(0.6) rotate(-12deg);
+  }
+  65% {
+    transform: scale(1.12) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes completionText {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+:global([data-motion="off"]) .rewardSparkle {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rewardSparkle {
+    display: none;
+  }
 }
 
 .completion h2 {

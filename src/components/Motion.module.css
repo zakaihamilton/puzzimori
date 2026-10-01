@@ -83,8 +83,7 @@
   animation: breathe 6s ease-in-out infinite;
 }
 
-.reaction[data-reaction="correct"],
-.reaction[data-reaction="complete"] {
+.reaction[data-reaction="correct"] {
   animation: happy 550ms ease-out;
 }
 
@@ -163,5 +162,66 @@
   100% {
     opacity: 0;
     transform: translateY(-16px) scale(0.7);
+  }
+}
+
+:global([data-celebrate="true"]) .reaction[data-reaction="complete"] {
+  animation: victoryHops 900ms ease-out both;
+}
+
+.reaction[data-reaction="complete"] .idle {
+  animation: none;
+}
+
+.sparkle {
+  opacity: 0;
+}
+
+:global([data-celebrate="false"]) .companion:has([data-reaction="complete"]) .sparkle {
+  animation: none;
+}
+
+:global([data-celebrate="true"]) .companion:has([data-reaction="complete"]) .sparkle {
+  animation: victorySparkle 1100ms ease-out both;
+}
+
+@keyframes victoryHops {
+  0%,
+  45%,
+  100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-12px) scale(1.12) rotate(-8deg);
+  }
+  65% {
+    transform: translateY(-9px) scale(1.08) rotate(7deg);
+  }
+  85% {
+    transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+
+@keyframes victorySparkle {
+  0%,
+  45%,
+  100% {
+    opacity: 0;
+    transform: translateY(0) scale(0.4);
+  }
+  20%,
+  70% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.2) rotate(25deg);
+  }
+}
+
+:global([data-motion="off"]) .sparkle {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle {
+    display: none;
   }
 }
