@@ -1,5 +1,6 @@
 // Puzzimori Service Worker for offline play
 const CACHE_NAME = "puzzimori-v1";
+const CACHE_PREFIX = "puzzimori-";
 
 const PRECACHE_URLS = ["/", "/manifest.webmanifest", "/icon.svg"];
 
@@ -18,7 +19,9 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((cacheNames) =>
         Promise.all(
-          cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name)),
+          cacheNames
+            .filter((name) => name.startsWith(CACHE_PREFIX) && name !== CACHE_NAME)
+            .map((name) => caches.delete(name)),
         ),
       )
       .then(() => self.clients.claim()),
