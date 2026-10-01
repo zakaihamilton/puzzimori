@@ -3,6 +3,7 @@ import type { Locale, SavedData } from "../src/game/state";
 import { messages } from "../src/i18n/messages";
 import { preferencesKey } from "../src/storage/preferences";
 import { storageKey } from "../src/storage/progress";
+import { themes } from "../src/engine/themes";
 import { generatePuzzle } from "../src/engine/generator";
 import { gameReducer, newGame } from "../src/game/state";
 
@@ -504,18 +505,21 @@ test("custom tooltips support hover, keyboard dismissal, and Hebrew", async ({ p
   await page.keyboard.press("Escape");
   await expect(page.getByRole("tooltip")).toHaveCount(0);
 
-  const firstToken = page.locator("#solver-title .symbolToken").first();
+  const firstToken = page.locator("#solver-title [data-tooltip-trigger]").first();
   await firstToken.hover();
   const theme = (await saved(page)).game!.puzzle.theme;
-  const themeIdx = ["forest", "sea", "garden", "market", "sky"].indexOf(theme);
+  const themeIdx = themes.findIndex((t) => t.id === theme);
   const expectedGlyphName = messages("en").themeEmojiNames[themeIdx]![0]!;
   await expect(page.getByRole("tooltip")).toHaveText(expectedGlyphName);
 
   await language(page, "en", "he");
-  await page.getByRole("button", { name: messages("he").chooseTheme, exact: true }).focus();
+  const brandHe = page.getByRole("button", { name: messages("he").chooseTheme, exact: true });
+  await brandHe.focus();
   await expect(page.getByRole("tooltip")).toHaveText(messages("he").chooseTheme);
+  await brandHe.blur();
+  await expect(page.getByRole("tooltip")).toHaveCount(0);
 
-  const firstTokenHe = page.locator("#solver-title .symbolToken").first();
+  const firstTokenHe = page.locator("#solver-title [data-tooltip-trigger]").first();
   await firstTokenHe.hover();
   const expectedGlyphNameHe = messages("he").themeEmojiNames[themeIdx]![0]!;
   await expect(page.getByRole("tooltip")).toHaveText(expectedGlyphNameHe);
@@ -659,3 +663,17 @@ for (const mode of ["preference", "reduced-motion"] as const) {
     await expect(page.getByRole("heading", { name: messages("en").findValue })).toBeVisible();
   });
 }
+
+test("serves valid web app manifest for PWA installation", async ({ page, request }) => {
+  await page.goto("/");
+  const manifestLink = page.locator('link[rel="manifest"]');
+  await expect(manifestLink).toHaveAttribute("href", "/manifest.webmanifest");
+
+  const response = await request.get("/manifest.webmanifest");
+  expect(response.status()).toBe(200);
+  const manifestJson = await response.json();
+  expect(manifestJson.name).toContain("Puzzimori");
+  expect(manifestJson.short_name).toBe("Puzzimori");
+  expect(manifestJson.display).toBe("standalone");
+  expect(manifestJson.icons.length).toBeGreaterThan(0);
+});
