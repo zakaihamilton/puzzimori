@@ -16,14 +16,14 @@
 }
 
 .bubble {
-  position: absolute;
-  z-index: 100;
-  inset-block-start: 100%;
-  inset-inline-start: 0;
-  padding-block: 10px;
-  padding-inline: 14px;
+  position: fixed;
+  z-index: 1000;
+  top: var(--tooltip-top, 0);
+  left: var(--tooltip-left, 0);
+  padding-block: 8px;
+  padding-inline: 12px;
   inline-size: max-content;
-  max-inline-size: min(240px, 70vw);
+  max-inline-size: min(240px, calc(100vw - 16px));
   border: 1px solid #e2dccb;
   border-radius: 12px;
   background: #fffdf5;
@@ -34,4 +34,5 @@
   line-height: 1.45;
   text-align: start;
   white-space: normal;
+  pointer-events: none;
 }

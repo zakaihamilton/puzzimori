@@ -622,7 +622,7 @@
 }
 
 .feedback[data-feedback="ready"] {
-  display: none;
+  visibility: hidden;
 }
 
 /* --------------------------------------------------------------------------
