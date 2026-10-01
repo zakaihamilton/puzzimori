@@ -503,9 +503,31 @@ test("custom tooltips support hover, keyboard dismissal, and Hebrew", async ({ p
   await expect(brand).toHaveAttribute("aria-describedby", /.+/);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("tooltip")).toHaveCount(0);
+
+  const firstToken = page.locator("#solver-title .symbolToken").first();
+  await firstToken.hover();
+  const theme = (await saved(page)).game!.puzzle.theme;
+  const themeIdx = ["forest", "sea", "garden", "market", "sky"].indexOf(theme);
+  const expectedGlyphName = messages("en").themeEmojiNames[themeIdx]![0]!;
+  await expect(page.getByRole("tooltip")).toHaveText(expectedGlyphName);
+
   await language(page, "en", "he");
   await page.getByRole("button", { name: messages("he").chooseTheme, exact: true }).focus();
   await expect(page.getByRole("tooltip")).toHaveText(messages("he").chooseTheme);
+
+  const firstTokenHe = page.locator("#solver-title .symbolToken").first();
+  await firstTokenHe.hover();
+  const expectedGlyphNameHe = messages("he").themeEmojiNames[themeIdx]![0]!;
+  await expect(page.getByRole("tooltip")).toHaveText(expectedGlyphNameHe);
+
+  const tooltipBox = await page.getByRole("tooltip").boundingBox();
+  const viewport = page.viewportSize();
+  if (tooltipBox && viewport) {
+    expect(tooltipBox.x).toBeGreaterThanOrEqual(0);
+    expect(tooltipBox.y).toBeGreaterThanOrEqual(0);
+    expect(tooltipBox.x + tooltipBox.width).toBeLessThanOrEqual(viewport.width);
+    expect(tooltipBox.y + tooltipBox.height).toBeLessThanOrEqual(viewport.height);
+  }
 });
 
 for (const locale of ["en", "he"] as const) {

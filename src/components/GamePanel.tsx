@@ -221,18 +221,18 @@ export function GamePanel({
                     ⌫
                   </button>
                 </div>
+                <p
+                  id="feedback"
+                  className={styles.feedback}
+                  role="status"
+                  data-feedback={game.feedback}
+                >
+                  {m[game.feedback]}
+                </p>
                 <button className={ui.primaryButton} type="submit">
                   <span aria-hidden="true">✓</span> {m.check}
                 </button>
               </form>
-              <p
-                id="feedback"
-                className={styles.feedback}
-                role="status"
-                data-feedback={game.feedback}
-              >
-                {m[game.feedback]}
-              </p>
             </section>
           )}
         </div>

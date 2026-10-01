@@ -3,19 +3,20 @@ import type { Expression, Operator, Puzzle } from "../engine/types";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Emoji } from "./Emoji";
+import { Tooltip } from "./Tooltip";
 import styles from "./GamePanel.module.css";
 
 export function SymbolView({ puzzle, id, locale }: { puzzle: Puzzle; id: string; locale: Locale }) {
   const index = puzzle.symbols.indexOf(id);
   const theme = getTheme(puzzle.theme);
   const themeIndex = themes.findIndex((item) => item.id === puzzle.theme);
+  const name = messages(locale).themeEmojiNames[themeIndex]![index]!;
   return (
-    <span className={styles.symbolToken}>
-      <Emoji
-        value={theme.emojis[index]!}
-        label={messages(locale).themeEmojiNames[themeIndex]![index]!}
-      />
-    </span>
+    <Tooltip text={name}>
+      <span className={styles.symbolToken}>
+        <Emoji value={theme.emojis[index]!} label={name} />
+      </span>
+    </Tooltip>
   );
 }
 
