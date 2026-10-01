@@ -16,6 +16,22 @@ const integer = (value: unknown, max: number): value is number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= max;
 const locale = (value: unknown): value is Locale => value === "en" || value === "he";
 
+function sameData(actual: unknown, expected: unknown): boolean {
+  if (actual === expected) return true;
+  if (Array.isArray(expected))
+    return (
+      Array.isArray(actual) &&
+      actual.length === expected.length &&
+      expected.every((value, index) => sameData(actual[index], value))
+    );
+  if (!record(actual) || !record(expected)) return false;
+  const keys = Object.keys(expected);
+  return (
+    Object.keys(actual).length === keys.length &&
+    keys.every((key) => Object.hasOwn(actual, key) && sameData(actual[key], expected[key]))
+  );
+}
+
 function parseGame(raw: unknown): GameState | null {
   if (!record(raw) || !record(raw.puzzle)) return null;
   const data = raw.puzzle;
@@ -36,11 +52,7 @@ function parseGame(raw: unknown): GameState | null {
     difficulty: data.difficulty,
     engineVersion: 1,
   });
-  if (
-    JSON.stringify(data) !== JSON.stringify(puzzle) ||
-    !integer(raw.step, puzzle.symbols.length) ||
-    !record(raw.solved)
-  )
+  if (!sameData(data, puzzle) || !integer(raw.step, puzzle.symbols.length) || !record(raw.solved))
     return null;
   const solved: Record<string, number> = {};
   for (const id of puzzle.symbols.slice(0, raw.step)) {

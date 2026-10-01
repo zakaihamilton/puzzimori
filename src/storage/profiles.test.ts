@@ -51,6 +51,30 @@ describe("versioned local profiles", () => {
     ])
       expect(loadProfiles(memory(raw))).toEqual({ data: emptyData, notice: "recovered" });
   });
+  it("accepts reordered object properties while preserving array order and puzzle contents", () => {
+    function reorder(value: unknown): unknown {
+      if (Array.isArray(value)) return value.map(reorder);
+      if (typeof value !== "object" || value === null) return value;
+      return Object.fromEntries(
+        Object.entries(value)
+          .reverse()
+          .map(([key, entry]) => [key, reorder(entry)]),
+      );
+    }
+    expect(loadProfiles(memory(JSON.stringify(reorder(fixture))))).toEqual({
+      data: fixture,
+      notice: "none",
+    });
+    const reversed = structuredClone(fixture);
+    reversed.profiles[0]!.game!.puzzle.equations.reverse();
+    expect(loadProfiles(memory(JSON.stringify(reversed))).data.profiles).toEqual([]);
+    const extra = structuredClone(fixture);
+    Object.assign(extra.profiles[0]!.game!.puzzle, { unexpected: true });
+    expect(loadProfiles(memory(JSON.stringify(extra))).data.profiles).toEqual([]);
+    const changed = structuredClone(fixture);
+    changed.profiles[0]!.game!.puzzle.equations[0]!.result++;
+    expect(loadProfiles(memory(JSON.stringify(changed))).data.profiles).toEqual([]);
+  });
   it("preserves valid profiles while dropping corrupted games and duplicate ids", () => {
     const bad = structuredClone(fixture.profiles[0]!);
     bad.id = "bad";

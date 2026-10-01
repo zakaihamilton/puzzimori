@@ -138,6 +138,7 @@ test("cancels difficulty replacement and restores focus, then confirms a new puz
   await expect(slider).toHaveValue("1");
   await expect(slider).toBeFocused();
   expect((await saved(page)).profiles[0]!.game).toEqual(original);
+  expect((await saved(page)).profiles[0]!.difficulty).toBe(original.puzzle.difficulty);
   await slider.press("End");
   await page.getByRole("button", { name: new RegExp(`${m.startLevel}\\s*10`, "i") }).click();
   await page.getByRole("button", { name: m.replaceConfirm }).click();
