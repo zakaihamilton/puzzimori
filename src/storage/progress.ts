@@ -1,14 +1,22 @@
 import { generatePuzzle } from "../engine/generator";
 import { themes } from "../engine/themes";
-import { newGame, type GameState, type Locale, type Profile, type SavedData } from "../game/state";
+import { newGame, type GameState, type Locale, type SavedData } from "../game/state";
 
-export const storageKey = "puzzimori.profiles.v1";
-export const avatars = ["🐼", "🦊", "🐸", "🐱", "🦁", "🐰", "🐨", "🦄"] as const;
-export const emptyData: SavedData = { version: 1, locale: "en", activeId: null, profiles: [] };
+export const storageKey = "puzzimori.game.v2";
+const legacyKey = "puzzimori.profiles.v1";
+export const emptyData: SavedData = {
+  version: 2,
+  locale: "en",
+  difficulty: 1,
+  completed: 0,
+  streak: 0,
+  game: null,
+};
 
 interface StoragePort {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
+  removeItem(key: string): void;
 }
 const record = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -87,17 +95,9 @@ function parseGame(raw: unknown): GameState | null {
   };
 }
 
-function parseProfile(raw: unknown): Profile | null {
+function parseProgress(raw: unknown): SavedData | null {
   if (
     !record(raw) ||
-    typeof raw.id !== "string" ||
-    raw.id.length > 80 ||
-    !raw.id ||
-    typeof raw.name !== "string" ||
-    !raw.name.trim() ||
-    raw.name.length > 24 ||
-    typeof raw.avatar !== "string" ||
-    !avatars.some((avatar) => avatar === raw.avatar) ||
     !locale(raw.locale) ||
     !integer(raw.difficulty, 10) ||
     raw.difficulty < 1 ||
@@ -108,9 +108,7 @@ function parseProfile(raw: unknown): Profile | null {
   const game = raw.game === null ? null : parseGame(raw.game);
   if (raw.game !== null && !game) return null;
   return {
-    id: raw.id,
-    name: raw.name.trim(),
-    avatar: raw.avatar,
+    version: 2,
     locale: raw.locale,
     difficulty: raw.difficulty,
     completed: raw.completed,
@@ -119,58 +117,63 @@ function parseProfile(raw: unknown): Profile | null {
   };
 }
 
-export function loadProfiles(storage: StoragePort): {
+export function loadProgress(storage: StoragePort): {
   data: SavedData;
   notice: "none" | "recovered" | "unavailable";
 } {
   let raw: string | null;
+  let legacy = false;
   try {
     raw = storage.getItem(storageKey);
+    if (raw === null) {
+      raw = storage.getItem(legacyKey);
+      legacy = raw !== null;
+    }
   } catch {
     return { data: emptyData, notice: "unavailable" };
   }
-  if (!raw) return { data: emptyData, notice: "none" };
+  if (raw === null) return { data: emptyData, notice: "none" };
   try {
     if (raw.length > 250_000) throw new Error("Storage too large");
     const parsed: unknown = JSON.parse(raw);
-    if (
-      !record(parsed) ||
-      parsed.version !== 1 ||
-      !locale(parsed.locale) ||
-      !Array.isArray(parsed.profiles) ||
-      parsed.profiles.length > 30
-    )
-      throw new Error("Invalid saved profiles");
-    const profiles = parsed.profiles
-      .map(parseProfile)
-      .filter((profile): profile is Profile => profile !== null);
-    const ids = new Set<string>();
-    const unique = profiles.filter((profile) => {
-      if (ids.has(profile.id)) return false;
-      ids.add(profile.id);
-      return true;
-    });
-    return {
-      data: {
-        version: 1,
-        locale: parsed.locale,
-        profiles: unique,
-        activeId: unique.some((profile) => profile.id === parsed.activeId)
-          ? (parsed.activeId as string)
-          : null,
-      },
-      notice: unique.length === parsed.profiles.length ? "none" : "recovered",
-    };
+    if (!record(parsed)) throw new Error("Invalid saved progress");
+    let data: SavedData | null;
+    if (legacy) {
+      if (
+        parsed.version !== 1 ||
+        !locale(parsed.locale) ||
+        !Array.isArray(parsed.profiles) ||
+        parsed.profiles.length > 30
+      )
+        throw new Error("Invalid legacy progress");
+      // Carry over only the selected game's progress, without any identity fields.
+      const selected =
+        parsed.profiles.find((entry) => record(entry) && entry.id === parsed.activeId) ??
+        parsed.profiles[0];
+      data =
+        selected === undefined && parsed.activeId === null
+          ? { ...emptyData, locale: parsed.locale }
+          : parseProgress(selected);
+    } else {
+      data = parsed.version === 2 ? parseProgress(parsed) : null;
+    }
+    if (!data) throw new Error("Invalid saved progress");
+    return { data, notice: "none" };
   } catch {
     return { data: emptyData, notice: "recovered" };
   }
 }
 
-export function saveProfiles(storage: StoragePort, data: SavedData): boolean {
+export function saveProgress(storage: StoragePort, data: SavedData): boolean {
   try {
     storage.setItem(storageKey, JSON.stringify(data));
-    return true;
   } catch {
     return false;
   }
+  try {
+    storage.removeItem(legacyKey);
+  } catch {
+    // The new save succeeded; legacy cleanup can be retried on the next save.
+  }
+  return true;
 }

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { checkAttempt } from "../engine/guidance";
 import { themes } from "../engine/themes";
-import type { GameAction, Locale, Profile } from "../game/state";
+import type { GameAction, Locale, SavedData } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion, type Reaction } from "./Companion";
 import { EquationView, SymbolView } from "./EquationView";
@@ -11,19 +11,19 @@ import styles from "./GamePanel.module.css";
 import ui from "./Puzzimori.module.css";
 
 export function GamePanel({
-  profile,
+  progress,
   locale,
   onAction,
   onNext,
   suspended,
 }: {
-  profile: Profile;
+  progress: SavedData;
   locale: Locale;
   onAction: (action: GameAction) => void;
   onNext: () => void;
   suspended: boolean;
 }) {
-  const game = profile.game!;
+  const game = progress.game!;
   const { puzzle } = game;
   const m = messages(locale);
   const equation = puzzle.equations[game.step];
@@ -109,7 +109,7 @@ export function GamePanel({
                 {m.nextPuzzle}
                 <span aria-hidden="true">↗</span>
               </button>
-              {profile.streak >= 3 && puzzle.difficulty < 10 && (
+              {progress.streak >= 3 && puzzle.difficulty < 10 && (
                 <div className={styles.suggestion}>
                   <p>{m.suggestion}</p>
                   <small>{m.levelInMenu}</small>
@@ -191,11 +191,7 @@ export function GamePanel({
         <section className={styles.board} aria-labelledby="clue-board-title">
           <div className={styles.boardHeader}>
             <div className={styles.boardCompanion}>
-              <Companion
-                avatar={profile.avatar}
-                reaction={complete ? "complete" : reaction}
-                pulse={pulse}
-              />
+              <Companion reaction={complete ? "complete" : reaction} pulse={pulse} />
               <span className={styles.boardTheme}>
                 <span aria-hidden="true">
                   <StoryIcon value={themes[themeIndex]!.cover} size="1.2em" />

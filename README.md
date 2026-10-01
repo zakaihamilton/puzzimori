@@ -12,7 +12,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open <http://localhost:3000>. Create an explorer, select an adventure, and discover the number behind each emoji. Switch to Hebrew using the language control. All progress stays in the current browser; no accounts, analytics, database, or AI service is required.
+Open <http://localhost:3000>. Start playing, select an adventure, and discover the number behind each emoji. Switch to Hebrew using the language control. All progress stays in the current browser; no accounts, analytics, database, or AI service is required.
 
 ## Learning experience
 
@@ -40,8 +40,8 @@ Subtraction is nonnegative and division has integer intermediate results. Each o
 ## Architecture
 
 - `src/engine`: typed expression trees, seeded generation, difficulty constraints, independent validation, and semantic hints. No React, Next.js, storage, or translation imports.
-- `src/game`: pure reducers for attempts, hints, profiles, language preferences, and completion statistics.
-- `src/storage`: a versioned localStorage adapter that regenerates and checks persisted puzzle metadata before accepting a saved game. Invalid profiles are discarded while valid profiles survive; unavailable storage falls back to memory.
+- `src/game`: pure reducers for attempts, hints, language preferences, and completion statistics.
+- `src/storage`: a versioned localStorage adapter that regenerates and checks persisted puzzle metadata before accepting a saved game. Invalid saved games are rejected; unavailable storage falls back to memory. Existing selected-profile progress migrates to a single game save without names, avatars, or player IDs.
 - `src/i18n`: complete English/Hebrew messages, emoji labels, operation names, and hint strategies.
 - `src/components`: responsive screens and scoped styles. `src/app` supplies the server-rendered application shell and metadata.
 
@@ -68,7 +68,7 @@ pnpm test:e2e
 
 Repnix requires type, lint, format, tests, accessibility, dead-code, and architecture coverage. Providers are TypeScript, ESLint with JSX accessibility rules, Prettier, Vitest, Knip, and dependency-cruiser. Architecture rules prohibit cycles and engine dependencies on framework or storage code. The project starts without a findings baseline or disabled quality rules.
 
-Tests cover 1,000 seeds at each of 10 levels, hint boundaries, arithmetic errors, game transitions, persistence validation, profile isolation, and translation completeness. Playwright covers desktop/mobile, English/Hebrew, all-operation puzzles, confirmation/cancellation, keyboard input, storage failures, reload/resume, and progression suggestions. GitHub Actions executes the same verification.
+Tests cover 1,000 seeds at each of 10 levels, hint boundaries, arithmetic errors, game transitions, persistence validation, legacy-save migration, and translation completeness. Playwright covers desktop/mobile, English/Hebrew, all-operation puzzles, confirmation/cancellation, keyboard input, storage failures, reload/resume, and progression suggestions. GitHub Actions executes the same verification.
 
 pnpm allows the `unrs-resolver` installation script for its native resolver dependency; other package build scripts need an explicit decision. Vitest is pinned to 5.0.2, which predates the package manager's release-age cutoff at creation time.
 
@@ -83,7 +83,7 @@ No environment variables are needed.
 
 The intended address is **puzzimori.vercel.app**. Preliminary checks on September 30, 2026 found no public GitHub/GitLab repository-name matches and `DEPLOYMENT_NOT_FOUND` at that address. This is not a reservation: Vercel confirms availability when assigning the alias. If it is unavailable at deployment, choose an alternative with the user.
 
-Progress belongs to each browser and origin. Localhost progress will not transfer to the deployed site, and devices do not synchronize. Clearing browser data removes saved profiles. Live deployment and publication are outside the initial local delivery.
+Progress belongs to each browser and origin. Localhost progress will not transfer to the deployed site, and devices do not synchronize. Clearing browser data removes saved progress. Live deployment and publication are outside the initial local delivery.
 
 The Menu's challenge slider previews a level. Press “Start level” to request a new puzzle at that level in the current puzzle's theme. If an unfinished puzzle has attempts or hints, confirmation is required before replacing it. Cancelling preserves both the current puzzle and the preferred difficulty. Choosing a world from the adventure gallery uses the preferred difficulty; the resume card shows the unfinished puzzle's original level.
 

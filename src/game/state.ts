@@ -14,22 +14,13 @@ export interface GameState {
   feedback: Feedback;
 }
 
-export interface Profile {
-  id: string;
-  name: string;
-  avatar: string;
+export interface SavedData {
+  version: 2;
   locale: Locale;
   difficulty: number;
   completed: number;
   streak: number;
   game: GameState | null;
-}
-
-export interface SavedData {
-  version: 1;
-  locale: Locale;
-  activeId: string | null;
-  profiles: Profile[];
 }
 
 export type GameAction = { type: "attempt"; answer: string } | { type: "hint" };
@@ -69,56 +60,23 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
 export type ModelAction =
   | { type: "hydrate"; data: SavedData }
-  | { type: "create"; profile: Profile }
-  | { type: "select"; id: string }
   | { type: "locale"; locale: Locale }
   | { type: "puzzle"; puzzle: Puzzle }
   | { type: "game"; action: GameAction };
 
 export function modelReducer(state: SavedData, action: ModelAction): SavedData {
   if (action.type === "hydrate") return action.data;
-  if (action.type === "create")
-    return {
-      ...state,
-      activeId: action.profile.id,
-      locale: action.profile.locale,
-      profiles: [...state.profiles, action.profile],
-    };
-  if (action.type === "select") {
-    const profile = state.profiles.find((profile) => profile.id === action.id);
-    return profile ? { ...state, activeId: profile.id, locale: profile.locale } : state;
-  }
-  if (action.type === "locale")
-    return {
-      ...state,
-      locale: action.locale,
-      profiles: state.profiles.map((profile) => {
-        if (profile.id !== state.activeId) return profile;
-        const wasDefaultName = profile.name === "Explorer" || profile.name === "מגלה";
-        return {
-          ...profile,
-          locale: action.locale,
-          name: wasDefaultName ? (action.locale === "he" ? "מגלה" : "Explorer") : profile.name,
-        };
-      }),
-    };
+  if (action.type === "locale") return { ...state, locale: action.locale };
+  if (action.type === "puzzle")
+    return { ...state, difficulty: action.puzzle.difficulty, game: newGame(action.puzzle) };
+  if (!state.game) return state;
+  const game = gameReducer(state.game, action.action);
+  const justCompleted =
+    state.game.step < state.game.puzzle.symbols.length && game.step === game.puzzle.symbols.length;
   return {
     ...state,
-    profiles: state.profiles.map((profile) => {
-      if (profile.id !== state.activeId) return profile;
-      if (action.type === "puzzle")
-        return { ...profile, difficulty: action.puzzle.difficulty, game: newGame(action.puzzle) };
-      if (!profile.game) return profile;
-      const game = gameReducer(profile.game, action.action);
-      const justCompleted =
-        profile.game.step < profile.game.puzzle.symbols.length &&
-        game.step === game.puzzle.symbols.length;
-      return {
-        ...profile,
-        game,
-        completed: profile.completed + (justCompleted ? 1 : 0),
-        streak: justCompleted ? (game.hintsUsed <= 1 ? profile.streak + 1 : 0) : profile.streak,
-      };
-    }),
+    game,
+    completed: state.completed + (justCompleted ? 1 : 0),
+    streak: justCompleted ? (game.hintsUsed <= 1 ? state.streak + 1 : 0) : state.streak,
   };
 }

@@ -17,7 +17,7 @@ describe("display preferences", () => {
     expect(saveAnimations(storage, true)).toBe(true);
     expect(loadAnimations(storage)).toBe(true);
   });
-  it("rejects invalid or unsupported preferences without affecting profiles", () => {
+  it("rejects invalid or unsupported preferences without affecting progress", () => {
     for (const raw of [
       "{broken",
       "null",

@@ -1,26 +1,22 @@
 import { useEffect, useRef } from "react";
-import type { Locale, Profile } from "../game/state";
+import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
 import { DifficultyPicker } from "./DifficultyPicker";
 import styles from "./Puzzimori.module.css";
 export function MenuDialog({
   locale,
-  profile,
   level,
   animations,
   onClose,
   onLocale,
-  onPlayer,
   onDifficulty,
   onAnimations,
 }: {
   locale: Locale;
-  profile: Profile | undefined;
   level: number;
   animations: boolean;
   onClose: () => void;
   onLocale: (locale: Locale) => void;
-  onPlayer: () => void;
   onDifficulty: (level: number) => void;
   onAnimations: (enabled: boolean) => void;
 }) {
@@ -91,20 +87,7 @@ export function MenuDialog({
           </button>
         </div>
       </div>
-      {profile && (
-        <>
-          <button
-            className={styles.playerChoice}
-            aria-label={`${m.switchProfile}: ${profile.name}`}
-            onClick={onPlayer}
-          >
-            <span aria-hidden="true">{profile.avatar}</span>
-            {m.switchProfile}
-            <strong>{profile.name}</strong>
-          </button>
-          <DifficultyPicker level={level} locale={locale} onChange={onDifficulty} />
-        </>
-      )}
+      <DifficultyPicker level={level} locale={locale} onChange={onDifficulty} />
       <label className={styles.menuRow}>
         <span>{m.animations}</span>
         <input

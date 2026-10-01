@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { themes } from "../engine/themes";
-import type { Locale, Profile } from "../game/state";
+import type { Locale, SavedData } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion } from "./Companion";
 import { WorldCover } from "./WorldArt";
@@ -8,20 +8,20 @@ import { StoryIcon } from "./StoryIcon";
 import styles from "./Puzzimori.module.css";
 
 export function ThemeGallery({
-  profile,
+  progress,
   locale,
   onTheme,
   onResume,
   onPreviewTheme,
 }: {
-  profile: Profile;
+  progress: SavedData;
   locale: Locale;
   onTheme: (id: string) => void;
   onResume: () => void;
   onPreviewTheme?: (themeId: string) => void;
 }) {
   const m = messages(locale);
-  const game = profile.game;
+  const game = progress.game;
   const hasUnfinished = Boolean(game && game.step < game.puzzle.symbols.length);
   const savedThemeId = hasUnfinished ? game?.puzzle.theme : undefined;
 
@@ -76,7 +76,7 @@ export function ThemeGallery({
     <section className={styles.gallery} aria-labelledby="gallery-title">
       <div className={styles.galleryHeader}>
         <div className={styles.galleryCompanion}>
-          <Companion avatar={profile.avatar} />
+          <Companion />
           <div>
             <h1 id="gallery-title">{m.chooseTheme}</h1>
             <p>{m.themeIntro}</p>
@@ -84,9 +84,9 @@ export function ThemeGallery({
         </div>
         <span
           className={styles.worldCount}
-          aria-label={`${m.completedLabel}: ${profile.completed}`}
+          aria-label={`${m.completedLabel}: ${progress.completed}`}
         >
-          🌟 {profile.completed}
+          🌟 {progress.completed}
         </span>
       </div>
 
@@ -174,8 +174,8 @@ export function ThemeGallery({
                   <p className={styles.showcaseDescription}>{m.themeDescriptions[index]}</p>
                   <div className={styles.showcaseMetaBadge} aria-hidden="true">
                     <span>
-                      ⭐ {m.level} {profile.difficulty} ·{" "}
-                      {m.difficultyNames[profile.difficulty - 1]}
+                      ⭐ {m.level} {progress.difficulty} ·{" "}
+                      {m.difficultyNames[progress.difficulty - 1]}
                     </span>
                   </div>
                 </div>
