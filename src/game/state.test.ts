@@ -4,31 +4,12 @@ import { gameReducer, modelReducer, newGame, type SavedData } from "./state";
 
 const puzzle = generatePuzzle({ seed: "state", theme: "garden", difficulty: 1, engineVersion: 1 });
 const initial: SavedData = {
-  version: 1,
+  version: 2,
   locale: "en",
-  activeId: "a",
-  profiles: [
-    {
-      id: "a",
-      name: "Ada",
-      avatar: "🐼",
-      locale: "en",
-      difficulty: 1,
-      completed: 0,
-      streak: 0,
-      game: newGame(puzzle),
-    },
-    {
-      id: "b",
-      name: "Bea",
-      avatar: "🐱",
-      locale: "he",
-      difficulty: 1,
-      completed: 0,
-      streak: 0,
-      game: null,
-    },
-  ],
+  difficulty: 1,
+  completed: 0,
+  streak: 0,
+  game: newGame(puzzle),
 };
 
 describe("game transitions", () => {
@@ -54,28 +35,20 @@ describe("game transitions", () => {
     game = gameReducer(game, { type: "attempt", answer: String(puzzle.values.s0) });
     expect(game).toMatchObject({ step: 1, hintStage: 0, hintsUsed: 3 });
   });
-  it("counts completion once, isolates profiles, and retains game through language changes", () => {
+  it("counts completion once and retains game through language changes", () => {
     let state = initial;
     for (const id of puzzle.symbols)
       state = modelReducer(state, {
         type: "game",
         action: { type: "attempt", answer: String(puzzle.values[id]) },
       });
-    expect(state.profiles[0]).toMatchObject({ completed: 1, streak: 1 });
+    expect(state).toMatchObject({ completed: 1, streak: 1 });
     state = modelReducer(state, { type: "game", action: { type: "attempt", answer: "1" } });
-    expect(state.profiles[0]!.completed).toBe(1);
-    const game = state.profiles[0]!.game;
+    expect(state.completed).toBe(1);
+    const game = state.game;
     state = modelReducer(state, { type: "locale", locale: "he" });
-    expect(state.profiles[0]!.game).toEqual(game);
-    expect(state.profiles[0]!.name).toBe("Ada");
-    expect(state.profiles[1]).toEqual(initial.profiles[1]);
-    const defaultNamed = modelReducer(
-      { ...initial, profiles: [{ ...initial.profiles[0]!, name: "Explorer" }] },
-      { type: "locale", locale: "he" },
-    );
-    expect(defaultNamed.profiles[0]!.name).toBe("מגלה");
-    state = modelReducer(state, { type: "select", id: "b" });
-    expect(state).toMatchObject({ activeId: "b", locale: "he" });
+    expect(state.game).toEqual(game);
+    expect(state.locale).toBe("he");
   });
   it("records three successful puzzles without changing difficulty", () => {
     let state = initial;
@@ -87,7 +60,7 @@ describe("game transitions", () => {
           action: { type: "attempt", answer: String(puzzle.values[id]) },
         });
     }
-    expect(state.profiles[0]).toMatchObject({ completed: 3, streak: 3, difficulty: 1 });
+    expect(state).toMatchObject({ completed: 3, streak: 3, difficulty: 1 });
     state = modelReducer(state, { type: "puzzle", puzzle });
     for (let i = 0; i < 2; i++)
       state = modelReducer(state, { type: "game", action: { type: "hint" } });
@@ -96,6 +69,6 @@ describe("game transitions", () => {
         type: "game",
         action: { type: "attempt", answer: String(puzzle.values[id]) },
       });
-    expect(state.profiles[0]).toMatchObject({ completed: 4, streak: 0 });
+    expect(state).toMatchObject({ completed: 4, streak: 0 });
   });
 });

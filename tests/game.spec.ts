@@ -2,7 +2,9 @@ import { expect, test, type Page } from "@playwright/test";
 import type { Locale, SavedData } from "../src/game/state";
 import { messages } from "../src/i18n/messages";
 import { preferencesKey } from "../src/storage/preferences";
-import { storageKey } from "../src/storage/profiles";
+import { storageKey } from "../src/storage/progress";
+import { generatePuzzle } from "../src/engine/generator";
+import { gameReducer, newGame } from "../src/game/state";
 
 async function saved(page: Page): Promise<SavedData> {
   return page.evaluate((key) => JSON.parse(localStorage.getItem(key)!), storageKey);
@@ -37,9 +39,7 @@ async function loadGame(page: Page, locale: Locale = "en", difficulty = 1) {
     await page.getByRole("button", { name: new RegExp(`${m.startLevel}\\s*10`, "i") }).click();
   }
   await expect(page.getByRole("heading", { name: m.findValue })).toBeVisible();
-  await expect
-    .poll(async () => (await saved(page)).profiles[0]!.game?.puzzle.difficulty)
-    .toBe(difficulty);
+  await expect.poll(async () => (await saved(page)).game?.puzzle.difficulty).toBe(difficulty);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 }
 
@@ -52,8 +52,7 @@ async function enterAnswer(page: Page, locale: Locale, value: string) {
 async function solvePuzzle(page: Page, locale: Locale) {
   const m = messages(locale);
   const data = await saved(page);
-  const profile = data.profiles.find((profile) => profile.id === data.activeId)!;
-  const { puzzle, step } = profile.game!;
+  const { puzzle, step } = data.game!;
   for (const id of puzzle.symbols.slice(step)) {
     await enterAnswer(page, locale, String(puzzle.values[id]));
     await page.getByRole("button", { name: m.check, exact: true }).click();
@@ -67,12 +66,15 @@ test("first page loads directly into gameplay without configuring a user or pick
   await page.goto("/");
   await expect(page.getByRole("heading", { name: messages("en").findValue })).toBeVisible();
   await expect(page.locator("#number-pad")).toBeVisible();
-  await expect(page.getByRole("heading", { name: messages("en").chooseProfile })).toHaveCount(0);
+  await expect(page.locator("#profile-title")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: messages("en").chooseTheme })).toHaveCount(0);
   const data = await saved(page);
-  expect(data.profiles.length).toBe(1);
-  expect(data.profiles[0]!.name).toBe(messages("en").player);
-  expect(data.profiles[0]!.game).not.toBeNull();
+  expect(data).not.toHaveProperty("profiles");
+  expect(data).not.toHaveProperty("activeId");
+  await openMenu(page);
+  await expect(page.locator("#menu-dialog button")).toHaveCount(4);
+  await closeMenu(page);
+  expect(data.game).not.toBeNull();
 });
 
 for (const locale of ["en", "he"] as const) {
@@ -110,10 +112,10 @@ for (const locale of ["en", "he"] as const) {
       await expect(page.locator("#feedback")).toHaveText(m.incorrect);
       await expect(page.getByRole("button", { name: m.hint, exact: true })).toHaveCount(0);
       await solvePuzzle(page, locale);
-      await expect.poll(async () => (await saved(page)).profiles[0]!.completed).toBe(1);
+      await expect.poll(async () => (await saved(page)).completed).toBe(1);
       await page.reload();
       await expect(page.getByRole("heading", { name: m.findValue })).toBeVisible();
-      expect((await saved(page)).profiles[0]!.completed).toBe(1);
+      expect((await saved(page)).completed).toBe(1);
       expect(errors).toEqual([]);
     });
   }
@@ -126,7 +128,7 @@ test("cancels difficulty replacement and restores focus, then confirms a new puz
   await loadGame(page);
   await enterAnswer(page, "en", "999");
   await page.getByRole("button", { name: m.check, exact: true }).click();
-  const original = (await saved(page)).profiles[0]!.game!;
+  const original = (await saved(page)).game!;
   await openMenu(page);
   const slider = page.getByRole("slider", { name: m.difficulty });
   await slider.focus();
@@ -137,46 +139,86 @@ test("cancels difficulty replacement and restores focus, then confirms a new puz
   await page.getByRole("button", { name: m.cancel }).click();
   await expect(slider).toHaveValue("1");
   await expect(slider).toBeFocused();
-  expect((await saved(page)).profiles[0]!.game).toEqual(original);
-  expect((await saved(page)).profiles[0]!.difficulty).toBe(original.puzzle.difficulty);
+  expect((await saved(page)).game).toEqual(original);
+  expect((await saved(page)).difficulty).toBe(original.puzzle.difficulty);
   await slider.press("End");
   await page.getByRole("button", { name: new RegExp(`${m.startLevel}\\s*10`, "i") }).click();
   await page.getByRole("button", { name: m.replaceConfirm }).click();
   await openMenu(page);
   await expect(slider).toHaveValue("10");
   await closeMenu(page);
-  await expect
-    .poll(async () => (await saved(page)).profiles[0]!.game!.puzzle.id)
-    .not.toBe(original.puzzle.id);
-  expect((await saved(page)).profiles[0]!.game!.attempts).toBe(0);
+  await expect.poll(async () => (await saved(page)).game!.puzzle.id).not.toBe(original.puzzle.id);
+  expect((await saved(page)).game!.attempts).toBe(0);
 });
 
-test("preserves a partially solved puzzle through language change, reload, and profile switching", async ({
-  page,
-}) => {
+test("preserves a partially solved puzzle through language change and reload", async ({ page }) => {
   const en = messages("en");
   const he = messages("he");
   await loadGame(page, "en");
-  const initial = (await saved(page)).profiles[0]!.game!;
+  const initial = (await saved(page)).game!;
   await enterAnswer(page, "en", String(initial.puzzle.values.s0));
   await page.getByRole("button", { name: en.check, exact: true }).click();
   await language(page, "en", "he");
   await expect(page.getByRole("heading", { name: he.findValue })).toBeVisible();
-  expect((await saved(page)).profiles[0]!.game!.step).toBe(1);
+  expect((await saved(page)).game!.step).toBe(1);
   await page.reload();
   await expect(page.getByRole("heading", { name: he.findValue })).toBeVisible();
-  expect((await saved(page)).profiles[0]!.game!.puzzle.id).toBe(initial.puzzle.id);
-  expect((await saved(page)).profiles[0]!.game!.step).toBe(1);
+  expect((await saved(page)).game!.puzzle.id).toBe(initial.puzzle.id);
+  expect((await saved(page)).game!.step).toBe(1);
+});
+
+test("migrates the selected legacy puzzle and removes player identities", async ({ page }) => {
+  const puzzle = generatePuzzle({
+    seed: "migration",
+    theme: "kitchen",
+    difficulty: 10,
+    engineVersion: 1,
+  });
+  const game = gameReducer(newGame(puzzle), { type: "attempt", answer: String(puzzle.values.s0) });
+  const legacy = {
+    version: 1,
+    locale: "en",
+    activeId: "selected",
+    profiles: [
+      {
+        id: "other",
+        name: "Ada",
+        avatar: "🐱",
+        locale: "en",
+        difficulty: 1,
+        completed: 0,
+        streak: 0,
+        game: null,
+      },
+      {
+        id: "selected",
+        name: "נועה",
+        avatar: "🦊",
+        locale: "he",
+        difficulty: 10,
+        completed: 4,
+        streak: 2,
+        game,
+      },
+    ],
+  };
+  await page.addInitScript((data) => {
+    if (!localStorage.getItem("puzzimori.game.v2"))
+      localStorage.setItem("puzzimori.profiles.v1", JSON.stringify(data));
+  }, legacy);
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: messages("he").findValue })).toBeVisible();
+  await expect
+    .poll(() => saved(page))
+    .toEqual({ version: 2, locale: "he", difficulty: 10, completed: 4, streak: 2, game });
+  expect(await page.evaluate(() => localStorage.getItem("puzzimori.profiles.v1"))).toBeNull();
   await openMenu(page, "he");
-  await page.getByRole("button", { name: `${he.switchProfile}: מגלה`, exact: true }).click();
-  await page.getByRole("button", { name: he.newProfile }).click();
-  await page.getByLabel(he.name, { exact: true }).fill("Bea");
-  await page.getByRole("button", { name: he.create, exact: true }).click();
-  await expect(page.getByRole("heading", { name: he.findValue })).toBeVisible();
-  const data = await saved(page);
-  expect(data.profiles[0]!.game!.step).toBe(1);
-  expect(data.profiles[1]!.game!.step).toBe(0);
-  expect(data.profiles[1]!.completed).toBe(0);
+  await expect(page.getByText("נועה", { exact: true })).toHaveCount(0);
+  await expect(page.locator("#menu-dialog button")).toHaveCount(4);
+  await closeMenu(page, "he");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: messages("he").findValue })).toBeVisible();
+  expect((await saved(page)).game).toEqual(game);
 });
 
 test("supports keyboard answers, the number pad, and three-success suggestions", async ({
@@ -191,24 +233,24 @@ test("supports keyboard answers, the number pad, and three-success suggestions",
   await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("1");
   await page.locator("#number-pad").getByRole("button", { name: m.erase, exact: true }).click();
   await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("?");
-  const puzzle = (await saved(page)).profiles[0]!.game!.puzzle;
+  const puzzle = (await saved(page)).game!.puzzle;
   const digit = String(puzzle.values.s0);
   await page.locator("#number-pad").getByRole("button", { name: digit, exact: true }).click();
   await expect(page.getByLabel(m.answer, { exact: true })).toHaveText(digit);
   await page.keyboard.press("Enter");
-  await expect.poll(async () => (await saved(page)).profiles[0]!.game!.step).toBe(1);
+  await expect.poll(async () => (await saved(page)).game!.step).toBe(1);
   await solvePuzzle(page, "en");
   for (let i = 0; i < 2; i++) {
     await page.getByRole("button", { name: m.nextPuzzle }).click();
     await solvePuzzle(page, "en");
   }
   await expect(page.getByText(m.suggestion)).toBeVisible();
-  expect((await saved(page)).profiles[0]!.difficulty).toBe(1);
+  expect((await saved(page)).difficulty).toBe(1);
   await expect(page.getByText(m.levelInMenu)).toBeVisible();
   await openMenu(page);
   await page.getByRole("slider", { name: m.difficulty }).press("ArrowRight");
   await page.getByRole("button", { name: new RegExp(`${m.startLevel}\\s*2`, "i") }).click();
-  await expect.poll(async () => (await saved(page)).profiles[0]!.game!.puzzle.difficulty).toBe(2);
+  await expect.poll(async () => (await saved(page)).game!.puzzle.difficulty).toBe(2);
 });
 
 test("plays in memory when local storage is blocked", async ({ page }) => {
@@ -252,10 +294,10 @@ test("previews a slider drag and preserves the unfinished puzzle when selecting 
   await page.mouse.up();
   await expect(slider).toHaveValue("10");
   await page.getByRole("button", { name: new RegExp(`${m.startLevel}\\s*10`, "i") }).click();
-  await expect.poll(async () => (await saved(page)).profiles[0]!.game?.puzzle.difficulty).toBe(10);
+  await expect.poll(async () => (await saved(page)).game?.puzzle.difficulty).toBe(10);
   await enterAnswer(page, "en", "999");
   await page.getByRole("button", { name: m.check, exact: true }).click();
-  const original = (await saved(page)).profiles[0]!.game!;
+  const original = (await saved(page)).game!;
   await openMenu(page);
   await slider.scrollIntoViewIfNeeded();
   const gameBox = (await slider.boundingBox())!;
@@ -265,7 +307,7 @@ test("previews a slider drag and preserves the unfinished puzzle when selecting 
     steps: 8,
   });
   await expect(page.getByRole("dialog", { name: m.replaceTitle, exact: true })).toHaveCount(0);
-  expect((await saved(page)).profiles[0]!.game).toEqual(original);
+  expect((await saved(page)).game).toEqual(original);
   await page.mouse.up();
   await page.getByRole("button", { name: new RegExp(m.startLevel, "i") }).click();
   await expect(page.getByRole("dialog", { name: m.replaceTitle, exact: true })).toBeVisible();
@@ -299,11 +341,11 @@ test("uses only a keypad and supports physical digit keys without opening a text
   await expect(page.getByLabel(messages("he").answer, { exact: true })).toHaveText("12");
   await page.keyboard.press("Delete");
   await expect(page.getByLabel(messages("he").answer, { exact: true })).toHaveText("?");
-  const puzzle = (await saved(page)).profiles[0]!.game!.puzzle;
+  const puzzle = (await saved(page)).game!.puzzle;
   await page.getByLabel(messages("he").answer, { exact: true }).focus();
   await page.keyboard.type(String(puzzle.values.s0));
   await page.keyboard.press("Enter");
-  await expect.poll(async () => (await saved(page)).profiles[0]!.game!.step).toBe(1);
+  await expect.poll(async () => (await saved(page)).game!.step).toBe(1);
 });
 
 test("keeps secondary controls in Menu and suspends gameplay shortcuts while dialogs are open", async ({
@@ -314,14 +356,14 @@ test("keeps secondary controls in Menu and suspends gameplay shortcuts while dia
   await expect(page.getByRole("slider")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "EN", exact: true })).toHaveCount(0);
   await expect(page.getByRole("button", { name: m.clear, exact: true })).toHaveCount(0);
-  const game = (await saved(page)).profiles[0]!.game!;
+  const game = (await saved(page)).game!;
   await expect(page.locator("[data-active]")).toHaveCount(game.puzzle.equations.length);
   await enterAnswer(page, "en", "12");
   await openMenu(page);
   await page.keyboard.type("34");
   await page.keyboard.press("Delete");
   await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("12");
-  expect((await saved(page)).profiles[0]!.game).toEqual(game);
+  expect((await saved(page)).game).toEqual(game);
   const menu = page.getByRole("dialog", { name: m.menu, exact: true });
   await menu.getByRole("button", { name: m.close, exact: true }).focus();
   await page.keyboard.press("Shift+Tab");
@@ -338,7 +380,7 @@ test("keeps secondary controls in Menu and suspends gameplay shortcuts while dia
   await expect(page.getByLabel(m.answer, { exact: true })).toHaveText("123");
   await page.locator("#number-pad").getByRole("button", { name: "4", exact: true }).focus();
   await page.keyboard.press("Enter");
-  await expect.poll(async () => (await saved(page)).profiles[0]!.game!.attempts).toBe(1);
+  await expect.poll(async () => (await saved(page)).game!.attempts).toBe(1);
 });
 
 test("persists animation preferences and respects reduced motion", async ({ page }) => {

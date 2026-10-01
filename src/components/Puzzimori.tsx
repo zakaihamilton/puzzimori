@@ -2,14 +2,13 @@
 
 import { useEffect, useReducer, useState } from "react";
 import { generatePuzzle } from "../engine/generator";
-import { modelReducer, newGame, type Locale, type Profile } from "../game/state";
+import { modelReducer, newGame, type Locale } from "../game/state";
 import { messages } from "../i18n/messages";
-import { avatars, emptyData, loadProfiles, saveProfiles } from "../storage/profiles";
+import { emptyData, loadProgress, saveProgress } from "../storage/progress";
 import { loadAnimations, saveAnimations } from "../storage/preferences";
 import { MenuDialog } from "./MenuDialog";
 import { WorldScene } from "./WorldScene";
 import { GamePanel } from "./GamePanel";
-import { ProfilePicker } from "./ProfilePicker";
 import { ReplaceDialog } from "./ReplaceDialog";
 import { ThemeGallery } from "./ThemeGallery";
 import styles from "./Puzzimori.module.css";
@@ -21,11 +20,10 @@ export function Puzzimori() {
   const [visible, setVisible] = useState(true);
   const [ready, setReady] = useState(false);
   const [notice, setNotice] = useState<"none" | "recovered" | "unavailable">("none");
-  const [screen, setScreen] = useState<"profiles" | "themes" | "game">("game");
+  const [screen, setScreen] = useState<"themes" | "game">("game");
   const [pending, setPending] = useState<{ theme: string; level: number } | null>(null);
   const [previewTheme, setPreviewTheme] = useState<string | undefined>(undefined);
-  const profile = model.profiles.find((item) => item.id === model.activeId);
-  const puzzleId = profile?.game?.puzzle.id;
+  const puzzleId = model.game?.puzzle.id;
   const m = messages(model.locale);
 
   useEffect(() => {
@@ -37,67 +35,26 @@ export function Puzzimori() {
     // Hydration happens after the server and client have rendered the same shell.
     Promise.resolve().then(() => {
       if (!mounted) return;
-      let loaded: ReturnType<typeof loadProfiles>;
+      let loaded: ReturnType<typeof loadProgress>;
       try {
-        loaded = loadProfiles(window.localStorage);
+        loaded = loadProgress(window.localStorage);
         setAnimations(loadAnimations(window.localStorage));
       } catch {
         loaded = { data: emptyData, notice: "unavailable" };
       }
       let activeData = loaded.data;
-      if (activeData.profiles.length === 0) {
-        const defaultPuzzle = generatePuzzle({
-          seed: crypto.randomUUID(),
-          theme: "crafting",
-          difficulty: 1,
-          engineVersion: 1,
-        });
-        const initialProfile: Profile = {
-          id: crypto.randomUUID(),
-          name: messages(activeData.locale).player,
-          avatar: avatars[0],
-          locale: activeData.locale,
-          difficulty: 1,
-          completed: 0,
-          streak: 0,
-          game: newGame(defaultPuzzle),
-        };
+      if (!activeData.game || activeData.game.step >= activeData.game.puzzle.symbols.length) {
         activeData = {
           ...activeData,
-          activeId: initialProfile.id,
-          profiles: [initialProfile],
+          game: newGame(
+            generatePuzzle({
+              seed: crypto.randomUUID(),
+              theme: activeData.game?.puzzle.theme ?? "crafting",
+              difficulty: activeData.difficulty,
+              engineVersion: 1,
+            }),
+          ),
         };
-      } else {
-        let activeProfile = activeData.profiles.find((p) => p.id === activeData.activeId);
-        if (!activeProfile) {
-          activeProfile = activeData.profiles[0]!;
-          activeData = {
-            ...activeData,
-            activeId: activeProfile.id,
-          };
-        }
-        if (
-          !activeProfile.game ||
-          activeProfile.game.step >= activeProfile.game.puzzle.symbols.length
-        ) {
-          const theme = activeProfile.game?.puzzle.theme ?? "crafting";
-          const newPuz = generatePuzzle({
-            seed: crypto.randomUUID(),
-            theme,
-            difficulty: activeProfile.difficulty,
-            engineVersion: 1,
-          });
-          const updatedProfile: Profile = {
-            ...activeProfile,
-            game: newGame(newPuz),
-          };
-          activeData = {
-            ...activeData,
-            profiles: activeData.profiles.map((p) =>
-              p.id === activeProfile!.id ? updatedProfile : p,
-            ),
-          };
-        }
       }
       dispatch({ type: "hydrate", data: activeData });
       setNotice(loaded.notice);
@@ -115,7 +72,7 @@ export function Puzzimori() {
     if (!ready || notice === "unavailable") return;
     let saved = false;
     try {
-      saved = saveProfiles(window.localStorage, model);
+      saved = saveProgress(window.localStorage, model);
     } catch {
       /* Storage can be disabled by browser policy. */
     }
@@ -151,7 +108,7 @@ export function Puzzimori() {
     setScreen("game");
   }
   function requestPuzzle(theme: string, level: number) {
-    const game = profile?.game;
+    const game = model.game;
     if (
       game &&
       game.step < game.puzzle.symbols.length &&
@@ -165,8 +122,7 @@ export function Puzzimori() {
     }
   }
   function changeDifficulty(level: number) {
-    if (!profile) return;
-    const currentTheme = profile.game?.puzzle.theme ?? previewTheme ?? "crafting";
+    const currentTheme = model.game?.puzzle.theme ?? previewTheme ?? "crafting";
     requestPuzzle(currentTheme, level);
   }
   function changeLocale(locale: Locale) {
@@ -189,7 +145,7 @@ export function Puzzimori() {
           type="button"
           className={styles.floatingBrand}
           onClick={() => {
-            if (profile) setScreen("themes");
+            if (ready) setScreen("themes");
           }}
           aria-label={m.chooseTheme}
           title={m.chooseTheme}
@@ -231,75 +187,35 @@ export function Puzzimori() {
               </p>
             )}
             <div
-              key={`${screen}-${model.activeId}`}
+              key={screen}
               className={styles.stage}
               data-theme={
                 screen === "game"
-                  ? profile?.game?.puzzle.theme
-                  : (previewTheme ?? profile?.game?.puzzle.theme ?? "crafting")
+                  ? model.game?.puzzle.theme
+                  : (previewTheme ?? model.game?.puzzle.theme ?? "crafting")
               }
             >
               <WorldScene
                 theme={
                   screen === "game"
-                    ? profile?.game?.puzzle.theme
-                    : (previewTheme ?? profile?.game?.puzzle.theme ?? "crafting")
+                    ? model.game?.puzzle.theme
+                    : (previewTheme ?? model.game?.puzzle.theme ?? "crafting")
                 }
               />
-              {screen === "profiles" || !profile ? (
-                <ProfilePicker
-                  profiles={model.profiles}
-                  locale={model.locale}
-                  onSelect={(id) => {
-                    dispatch({ type: "select", id });
-                    const selected = model.profiles.find((p) => p.id === id);
-                    if (
-                      selected &&
-                      (!selected.game || selected.game.step >= selected.game.puzzle.symbols.length)
-                    ) {
-                      start("crafting", selected.difficulty);
-                    } else {
-                      setScreen("game");
-                    }
-                  }}
-                  onCreate={(name, avatar) => {
-                    const newProfileId = crypto.randomUUID();
-                    const puzzle = generatePuzzle({
-                      seed: crypto.randomUUID(),
-                      theme: "crafting",
-                      difficulty: 1,
-                      engineVersion: 1,
-                    });
-                    dispatch({
-                      type: "create",
-                      profile: {
-                        id: newProfileId,
-                        name,
-                        avatar,
-                        locale: model.locale,
-                        difficulty: 1,
-                        completed: 0,
-                        streak: 0,
-                        game: newGame(puzzle),
-                      },
-                    });
-                    setScreen("game");
-                  }}
-                />
-              ) : screen === "game" && profile.game ? (
+              {screen === "game" && model.game ? (
                 <GamePanel
-                  key={profile.game.puzzle.id}
-                  profile={profile}
+                  key={model.game.puzzle.id}
+                  progress={model}
                   locale={model.locale}
                   onAction={(action) => dispatch({ type: "game", action })}
-                  onNext={() => start(profile.game!.puzzle.theme, profile.difficulty)}
+                  onNext={() => start(model.game!.puzzle.theme, model.difficulty)}
                   suspended={menuOpen || pending !== null}
                 />
               ) : (
                 <ThemeGallery
-                  profile={profile}
+                  progress={model}
                   locale={model.locale}
-                  onTheme={(theme) => requestPuzzle(theme, profile.difficulty)}
+                  onTheme={(theme) => requestPuzzle(theme, model.difficulty)}
                   onResume={() => setScreen("game")}
                   onPreviewTheme={setPreviewTheme}
                 />
@@ -311,20 +227,11 @@ export function Puzzimori() {
       {menuOpen && (
         <MenuDialog
           locale={model.locale}
-          profile={profile}
-          level={
-            screen === "game" && profile?.game
-              ? profile.game.puzzle.difficulty
-              : (profile?.difficulty ?? 1)
-          }
+          level={screen === "game" && model.game ? model.game.puzzle.difficulty : model.difficulty}
           animations={animations}
           onClose={() => setMenuOpen(false)}
           onLocale={changeLocale}
           onAnimations={setAnimations}
-          onPlayer={() => {
-            setMenuOpen(false);
-            setScreen("profiles");
-          }}
           onDifficulty={changeDifficulty}
         />
       )}
