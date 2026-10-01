@@ -62,6 +62,13 @@ export function Puzzimori() {
       setScreen("game");
       setReady(true);
     });
+
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
+        // Service worker registration errors ignored gracefully
+      });
+    }
+
     return () => {
       mounted = false;
     };
