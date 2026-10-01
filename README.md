@@ -64,7 +64,7 @@ Open <http://localhost:3000> and start discovering.
 | 9     | 4       | 1–12   | Division divisors up to 10           | 100                    |
 | 10    | 5       | 1–20   | All four operations                  | 200                    |
 
-Subtraction is nonnegative and division has integer intermediate results. Each operation enabled at a level appears in every generated puzzle. Equal emoji values are permitted: different pictures do not have to represent different numbers.
+Subtraction is nonnegative and division has integer intermediate results. Each operation enabled at a level appears in every generated puzzle. Generated puzzles assign a distinct value to each emoji.
 
 ## Architecture
 

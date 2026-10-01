@@ -700,3 +700,28 @@ test("serves valid web app manifest for PWA installation", async ({ page, reques
   expect(manifestJson.display).toBe("standalone");
   expect(manifestJson.icons.length).toBeGreaterThan(0);
 });
+
+test("preserves unrelated origin caches and serves the cached page offline", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/manifest.webmanifest");
+  await page.evaluate(async () => {
+    const cache = await caches.open("another-app-v1");
+    await cache.put("/another-app-marker", new Response("keep"));
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: messages("en").findValue })).toBeVisible();
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready;
+  });
+  await expect
+    .poll(() => page.evaluate(async () => (await caches.keys()).includes("another-app-v1")))
+    .toBe(true);
+
+  await context.setOffline(true);
+  const response = await page.reload();
+  expect(response?.status()).toBe(200);
+  await expect(page).toHaveTitle(/Puzzimori/);
+});
