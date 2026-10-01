@@ -72,7 +72,6 @@ export type ModelAction =
   | { type: "create"; profile: Profile }
   | { type: "select"; id: string }
   | { type: "locale"; locale: Locale }
-  | { type: "difficulty"; level: number }
   | { type: "puzzle"; puzzle: Puzzle }
   | { type: "game"; action: GameAction };
 
@@ -107,7 +106,6 @@ export function modelReducer(state: SavedData, action: ModelAction): SavedData {
     ...state,
     profiles: state.profiles.map((profile) => {
       if (profile.id !== state.activeId) return profile;
-      if (action.type === "difficulty") return { ...profile, difficulty: action.level };
       if (action.type === "puzzle")
         return { ...profile, difficulty: action.puzzle.difficulty, game: newGame(action.puzzle) };
       if (!profile.game) return profile;

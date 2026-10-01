@@ -166,7 +166,6 @@ export function Puzzimori() {
   }
   function changeDifficulty(level: number) {
     if (!profile) return;
-    dispatch({ type: "difficulty", level });
     const currentTheme = profile.game?.puzzle.theme ?? previewTheme ?? "crafting";
     requestPuzzle(currentTheme, level);
   }
