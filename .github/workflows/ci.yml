@@ -18,6 +18,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm health
       - run: pnpm audit:dependencies
       - run: pnpm build
@@ -29,3 +30,21 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  visual-regression:
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.21.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium
+      - run: pnpm health:visual
+        env:
+          RUN_VISUAL_REGRESSION: "1"

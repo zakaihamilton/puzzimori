@@ -103,6 +103,7 @@
   font-size: 26px;
   animation: sparkle 750ms ease-out both;
   text-shadow: 0 0 8px rgba(200, 138, 44, 0.4);
+  opacity: 0;
 }
 
 @keyframes drift {
@@ -171,10 +172,6 @@
 
 .reaction[data-reaction="complete"] .idle {
   animation: none;
-}
-
-.sparkle {
-  opacity: 0;
 }
 
 :global([data-celebrate="false"]) .companion:has([data-reaction="complete"]) .sparkle {
