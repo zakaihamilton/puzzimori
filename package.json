@@ -23,7 +23,7 @@
     "health:architecture": "depcruise --output-type json --config .dependency-cruiser.cjs -- src",
     "audit:dependencies": "pnpm audit --audit-level high",
     "verify": "pnpm health && pnpm audit:dependencies && pnpm build && pnpm test:e2e",
-    "health:a11y": "pnpm build && playwright test tests/guardrails.spec.ts --project=desktop",
+    "health:a11y": "pnpm build && playwright test tests/guardrails.spec.ts --project=desktop --grep=WCAG",
     "health:visual": "if [ \"$RUN_VISUAL_REGRESSION\" = \"1\" ] || [ \"$(uname)\" = \"Darwin\" ]; then pnpm build && playwright test tests/guardrails.spec.ts --project=desktop; else echo \"Visual regression runs in the macOS guardrail job.\"; fi",
     "health:interactions": "vitest run tests/ui/user-interactions.test.tsx",
     "health:styles": "stylelint --formatter json \"**/*.{css,pcss,postcss}\""
