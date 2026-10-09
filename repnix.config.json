@@ -37,7 +37,7 @@
     }
   },
   "execution": {
-    "jobs": 2,
+    "jobs": 1,
     "timeoutSeconds": 300
   }
 }
