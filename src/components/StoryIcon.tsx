@@ -28,6 +28,7 @@ export function StoryIcon({ value, className, size = "1em" }: StoryIconProps) {
       aria-hidden="true"
     >
       <svg
+        aria-hidden="true"
         viewBox="0 0 64 64"
         width="100%"
         height="100%"

@@ -61,12 +61,19 @@ export function PapercraftConfetti() {
           }
         >
           {piece.type === "star" && (
-            <svg viewBox="0 0 24 24" width="100%" height="100%" fill={piece.color}>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width="100%"
+              height="100%"
+              fill={piece.color}
+            >
               <polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" />
             </svg>
           )}
           {piece.type === "ribbon" && (
             <svg
+              aria-hidden="true"
               viewBox="0 0 24 24"
               width="100%"
               height="100%"
@@ -79,12 +86,24 @@ export function PapercraftConfetti() {
             </svg>
           )}
           {piece.type === "flake" && (
-            <svg viewBox="0 0 24 24" width="100%" height="100%" fill={piece.color}>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width="100%"
+              height="100%"
+              fill={piece.color}
+            >
               <rect x="4" y="4" width="16" height="16" rx="3" transform="rotate(15 12 12)" />
             </svg>
           )}
           {piece.type === "petal" && (
-            <svg viewBox="0 0 24 24" width="100%" height="100%" fill={piece.color}>
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              width="100%"
+              height="100%"
+              fill={piece.color}
+            >
               <ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-30 12 12)" />
             </svg>
           )}

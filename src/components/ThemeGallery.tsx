@@ -83,11 +83,10 @@ export function ThemeGallery({
             <p>{m.themeIntro}</p>
           </div>
         </div>
-        <span
-          className={styles.worldCount}
-          aria-label={`${m.completedLabel}: ${progress.completed}`}
-        >
-          🌟 {progress.completed}
+        <span className={styles.worldCount}>
+          <span className={styles.srOnly}>{m.completedLabel}: </span>
+          <span aria-hidden="true">🌟 </span>
+          {progress.completed}
         </span>
       </div>
 
@@ -183,8 +182,8 @@ export function ThemeGallery({
 
                 <div
                   className={styles.showcaseEmojiArc}
-                  role={isCenter ? "group" : undefined}
-                  aria-label={isCenter ? m.themeNames[index] : undefined}
+                  role="group"
+                  aria-label={m.themeNames[index]}
                   aria-hidden={isDecorative ? "true" : undefined}
                 >
                   {theme.emojis.map((emoji, emojiIndex) => (

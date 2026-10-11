@@ -122,6 +122,7 @@ export function GamePanel({
                 <svg
                   className={styles.rewardStar}
                   data-reward-star
+                  aria-hidden="true"
                   viewBox="0 0 120 120"
                   fill="none"
                 >
@@ -153,7 +154,7 @@ export function GamePanel({
                 {m.completionTitle}
               </h2>
               <p>{m.completionIntro}</p>
-              <button className={ui.primaryButton} onClick={onNext}>
+              <button type="button" className={ui.primaryButton} onClick={onNext}>
                 {m.nextPuzzle}
                 <span aria-hidden="true">↗</span>
               </button>
@@ -306,6 +307,7 @@ export function GamePanel({
                 key={id}
                 dir="ltr"
                 className={styles.symbolChip}
+                role="group"
                 data-found={game.solved[id] !== undefined}
                 aria-label={`${m.step} ${index + 1}: ${game.solved[id] !== undefined ? m.found : m.unknown}`}
               >

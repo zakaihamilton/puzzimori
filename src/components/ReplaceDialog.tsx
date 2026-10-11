@@ -43,10 +43,10 @@ export function ReplaceDialog({
       <h2 id="replace-title">{m.replaceTitle}</h2>
       <p id="replace-body">{m.replaceBody}</p>
       <div className={styles.dialogButtons}>
-        <button ref={cancelRef} className={styles.secondaryButton} onClick={onCancel}>
+        <button type="button" ref={cancelRef} className={styles.secondaryButton} onClick={onCancel}>
           {m.cancel}
         </button>
-        <button className={styles.primaryButton} onClick={onConfirm}>
+        <button type="button" className={styles.primaryButton} onClick={onConfirm}>
           {m.replaceConfirm}
         </button>
       </div>

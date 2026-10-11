@@ -72,17 +72,27 @@ export function MenuDialog({
     >
       <div className={styles.menuHeading}>
         <h2 id="menu-title">{m.menu}</h2>
-        <button ref={closeRef} className={styles.secondaryButton} onClick={onClose}>
+        <button type="button" ref={closeRef} className={styles.secondaryButton} onClick={onClose}>
           {m.close}
         </button>
       </div>
       <div className={styles.menuRow}>
         <span>{m.language}</span>
         <div className={styles.languageToggle} role="group" aria-label={m.language}>
-          <button lang="en" aria-pressed={locale === "en"} onClick={() => onLocale("en")}>
+          <button
+            type="button"
+            lang="en"
+            aria-pressed={locale === "en"}
+            onClick={() => onLocale("en")}
+          >
             EN
           </button>
-          <button lang="he" aria-pressed={locale === "he"} onClick={() => onLocale("he")}>
+          <button
+            type="button"
+            lang="he"
+            aria-pressed={locale === "he"}
+            onClick={() => onLocale("he")}
+          >
             עב
           </button>
         </div>
@@ -94,6 +104,7 @@ export function MenuDialog({
           type="checkbox"
           role="switch"
           checked={animations}
+          aria-checked={animations}
           onChange={(event) => onAnimations(event.target.checked)}
         />
       </label>
