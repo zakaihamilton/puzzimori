@@ -172,7 +172,9 @@ export function validatePuzzle(puzzle: Puzzle): boolean {
         return false;
       const ops = operationsIn(equation.expression);
       if (ops.some((op) => !spec.operations.includes(op))) return false;
-      ops.forEach((op) => found.add(op));
+      ops.forEach((op) => {
+        found.add(op);
+      });
       if (
         evaluate(equation.expression, puzzle.values) !== equation.result ||
         equation.result > spec.maxTotal

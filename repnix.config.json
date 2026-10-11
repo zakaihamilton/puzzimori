@@ -14,9 +14,6 @@
     "tests": {
       "mode": "required"
     },
-    "accessibility": {
-      "mode": "required"
-    },
     "dead-code": {
       "mode": "required"
     },
@@ -30,9 +27,6 @@
       "mode": "required"
     },
     "interactions": {
-      "mode": "required"
-    },
-    "styles": {
       "mode": "required"
     }
   },

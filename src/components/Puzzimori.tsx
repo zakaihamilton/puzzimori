@@ -194,6 +194,7 @@ export function Puzzimori() {
         </Tooltip>
         <div className={styles.floatingControls}>
           <button
+            type="button"
             className={styles.floatingButton}
             onClick={() => setMenuOpen(true)}
             disabled={!ready}

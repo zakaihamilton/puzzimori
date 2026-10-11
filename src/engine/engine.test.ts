@@ -52,7 +52,9 @@ describe("procedural puzzle invariants", () => {
           expect(value).toBeGreaterThanOrEqual(1);
           expect(value).toBeLessThanOrEqual(spec.maxValue);
           solved[equation.target] = value;
-          operationsIn(equation.expression).forEach((operation) => operations.add(operation));
+          operationsIn(equation.expression).forEach((operation) => {
+            operations.add(operation);
+          });
         }
         expect([...operations].sort()).toEqual([...spec.operations].sort());
         signatures.add(JSON.stringify(puzzle.values));
