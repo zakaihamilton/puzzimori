@@ -47,7 +47,7 @@
     "jsdom": "^26.1.0",
     "knip": "6.38.0",
     "repnix": "^1.1.0",
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "vitest": "5.0.2"
   },
   "overrides": {

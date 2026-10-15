@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const config: NextConfig = {
+  experimental: { useTypeScriptCli: true },
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {
