@@ -10,19 +10,21 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
       - uses: actions/setup-node@v4
         with:
           node-version: 24.22.0
-          cache: npm
-      - run: npm install --global npm@11.9.0
-      - run: npm ci
-      - run: npm exec -- playwright install --with-deps chromium
-      - run: npm run health
-      - run: npm run health:styles
-      - run: npm run audit:dependencies
-      - run: npm run build
-      - run: npm exec -- playwright install --with-deps chromium
-      - run: npm run test:e2e
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run health
+      - run: pnpm run health:styles
+      - run: pnpm run audit:dependencies
+      - run: pnpm run build
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -38,14 +40,16 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
       - uses: actions/setup-node@v4
         with:
           node-version: 24.22.0
-          cache: npm
-      - run: npm install --global npm@11.9.0
-      - run: npm ci
-      - run: npm exec -- playwright install chromium
-      - run: npm run health:visual
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install chromium
+      - run: pnpm run health:visual
         env:
           RUN_VISUAL_REGRESSION: "1"
       - uses: actions/upload-artifact@v4

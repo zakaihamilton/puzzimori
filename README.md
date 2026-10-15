@@ -39,11 +39,11 @@ Progress belongs to one browser and site address. It does not sync across device
 
 ## Run locally
 
-Built with Next.js, React, TypeScript, Biome, and CSS Modules. Use **Node.js 24** (see `.nvmrc`) and **npm 11.9.0**.
+Built with Next.js, React, TypeScript, Biome, and CSS Modules. Use **Node.js 24** (see `.nvmrc`) and **pnpm 10.33.0**.
 
 ```sh
-npm ci
-npm run dev
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
 Open <http://localhost:3000> and start discovering.
@@ -80,21 +80,21 @@ The language switch sets page language and direction while mathematical expressi
 ## Verification
 
 ```sh
-npm exec -- playwright install chromium
-npm run verify
+pnpm exec playwright install chromium
+pnpm run verify
 ```
 
-`npm run verify` runs Repnix health checks, dependency auditing, the production build, and browser tests. Health checks cover types, lint, formatting, unit tests, accessibility rules, dead code, and architecture boundaries.
+`pnpm run verify` runs Repnix health checks, dependency auditing, the production build, and browser tests. Health checks cover types, lint, formatting, unit tests, accessibility rules, dead code, and architecture boundaries.
 
 Tests cover 1,000 seeds at each of ten levels, unique solutions, sequential solvability, hint boundaries, game transitions, saved-puzzle validation, legacy-save migration, and translation completeness. Browser tests exercise desktop/mobile play, English/Hebrew layouts, keyboard and keypad input, puzzle replacement, storage failures, reload/resume, animation preferences, and progression suggestions. GitHub Actions runs the same verification.
 
 For focused checks:
 
 ```sh
-npm run health
-npm run test:run
-npm run build
-npm run test:e2e
+pnpm run health
+pnpm run test:run
+pnpm run build
+pnpm run test:e2e
 ```
 
 ## Deploy to Vercel
@@ -103,5 +103,5 @@ No environment variables are needed.
 
 1. Push the project to your Git provider.
 2. Import it into Vercel using the **Next.js** framework preset and repository root directory.
-3. Set installation to `npm ci`, the build to `npm run build`, and Node.js to version 24.
+3. Set installation to `pnpm install --frozen-lockfile`, the build to `pnpm run build`, and Node.js to version 24.
 4. Deploy, then configure the site address in the project's Domains settings.

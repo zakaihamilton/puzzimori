@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "npm@11.9.0",
+  "packageManager": "pnpm@10.33.0",
   "engines": {
     "node": ">=24.22.0 <25"
   },
@@ -21,10 +21,10 @@
     "health": "repnix check",
     "health:dead-code": "knip --reporter json",
     "health:architecture": "depcruise --output-type json --config .dependency-cruiser.cjs -- src",
-    "audit:dependencies": "npm audit --audit-level=high",
-    "verify": "npm run health && npm run health:styles && npm run audit:dependencies && npm run build && npm run test:e2e",
-    "health:a11y": "npm run build && npm exec -- playwright test tests/guardrails.spec.ts --project=desktop --grep=WCAG",
-    "health:visual": "if [ \"$RUN_VISUAL_REGRESSION\" = \"1\" ] || [ \"$(uname)\" = \"Darwin\" ]; then npm run build && npm exec -- playwright test tests/guardrails.spec.ts --project=desktop; else echo \"Visual regression runs in the macOS guardrail job.\"; fi",
+    "audit:dependencies": "pnpm audit --audit-level=high",
+    "verify": "pnpm run health && pnpm run health:styles && pnpm run audit:dependencies && pnpm run build && pnpm run test:e2e",
+    "health:a11y": "pnpm run build && pnpm exec playwright test tests/guardrails.spec.ts --project=desktop --grep=WCAG",
+    "health:visual": "if [ \"$RUN_VISUAL_REGRESSION\" = \"1\" ] || [ \"$(uname)\" = \"Darwin\" ]; then pnpm run build && pnpm exec playwright test tests/guardrails.spec.ts --project=desktop; else echo \"Visual regression runs in the macOS guardrail job.\"; fi",
     "health:interactions": "vitest run tests/ui/user-interactions.test.tsx",
     "health:styles": "find src -type f -name '*.css' -print0 | xargs -0 biome lint"
   },
