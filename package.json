@@ -5,7 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=24.22.0 <25"
+    "node": ">=24.22.1 <25"
   },
   "scripts": {
     "dev": "next dev",
@@ -48,9 +48,14 @@
     "knip": "6.38.0",
     "repnix": "^1.1.0",
     "typescript": "6.0.3",
-    "vitest": "5.0.2"
+    "vitest": "5.0.3"
   },
   "overrides": {
     "source-map-js": "^1.2.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "zod": "4.6.6"
+    }
   }
 }
