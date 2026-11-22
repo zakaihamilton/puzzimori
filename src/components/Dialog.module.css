@@ -1,0 +1,115 @@
+/* --------------------------------------------------------------------------
+   Dialogs: Leather-Bound Journal Modals (MenuDialog & ReplaceDialog)
+   -------------------------------------------------------------------------- */
+.dialog {
+  background: linear-gradient(180deg, #fffdf8 0%, #fbf5e9 100%);
+  border: 2px solid var(--line-strong);
+  border-radius: 22px;
+  padding: 24px 26px;
+  max-width: min(480px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  box-shadow:
+    0 16px 48px rgba(45, 34, 25, 0.35),
+    inset 0 0 24px rgba(220, 205, 175, 0.15);
+  color: var(--ink);
+}
+
+.dialog::backdrop {
+  background: rgba(35, 26, 18, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.menuDialog {
+  width: min(460px, calc(100% - 32px));
+}
+
+.menuHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-end: 16px;
+  padding-block-end: 12px;
+  border-block-end: 1.5px dashed var(--line);
+}
+
+.menuHeading h2 {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.menuRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.menuRow input[type="checkbox"] {
+  width: 44px;
+  height: 26px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.languageToggle {
+  display: inline-flex;
+  background: var(--paper-tint);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.languageToggle button {
+  border: 0;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  background: transparent;
+  min-height: 36px;
+}
+
+.languageToggle button[aria-pressed="true"] {
+  background: var(--gold);
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(200, 138, 44, 0.25);
+}
+
+.dialogEmoji {
+  font-size: 32px;
+  display: block;
+  margin-block-end: 10px;
+}
+
+.dialog h2 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  margin: 0 0 8px;
+}
+
+.dialog p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+
+.dialogButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 760px) {
+  .dialog {
+    padding: 18px 16px;
+  }
+}

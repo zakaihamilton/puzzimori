@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
+import controls from "./Controls.module.css";
+import styles from "./Dialog.module.css";
 import { DifficultyPicker } from "./DifficultyPicker";
-import styles from "./Puzzimori.module.css";
 export function MenuDialog({
   locale,
   level,
@@ -72,7 +73,7 @@ export function MenuDialog({
     >
       <div className={styles.menuHeading}>
         <h2 id="menu-title">{m.menu}</h2>
-        <button type="button" ref={closeRef} className={styles.secondaryButton} onClick={onClose}>
+        <button type="button" ref={closeRef} className={controls.secondaryButton} onClick={onClose}>
           {m.close}
         </button>
       </div>

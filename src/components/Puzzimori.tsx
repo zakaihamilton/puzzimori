@@ -2,17 +2,17 @@
 
 import { useEffect, useReducer, useState } from "react";
 import { generatePuzzle } from "../engine/generator";
-import { modelReducer, newGame, type Locale } from "../game/state";
+import { type Locale, modelReducer, newGame } from "../game/state";
 import { messages } from "../i18n/messages";
-import { emptyData, loadProgress, saveProgress } from "../storage/progress";
 import { loadAnimations, saveAnimations } from "../storage/preferences";
-import { Tooltip } from "./Tooltip";
-import { MenuDialog } from "./MenuDialog";
-import { WorldScene } from "./WorldScene";
+import { emptyData, loadProgress, saveProgress } from "../storage/progress";
 import { GamePanel } from "./GamePanel";
+import { MenuDialog } from "./MenuDialog";
+import styles from "./Puzzimori.module.css";
 import { ReplaceDialog } from "./ReplaceDialog";
 import { ThemeGallery } from "./ThemeGallery";
-import styles from "./Puzzimori.module.css";
+import { Tooltip } from "./Tooltip";
+import { WorldScene } from "./WorldScene";
 
 export function Puzzimori() {
   const [model, dispatch] = useReducer(modelReducer, emptyData);

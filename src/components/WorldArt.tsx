@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { getTheme } from "../engine/themes";
-import { StoryIcon } from "./StoryIcon";
 import styles from "./StoryArt.module.css";
+import { StoryIcon } from "./StoryIcon";
 
 const palettes: Record<string, [string, string, string]> = {
   crafting: ["#d9eee0", "#81b891", "#477f62"],

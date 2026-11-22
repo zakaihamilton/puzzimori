@@ -1,7 +1,7 @@
-import { WorldLandscape } from "./WorldArt";
 import { getTheme } from "../engine/themes";
-import { StoryIcon } from "./StoryIcon";
 import styles from "./Motion.module.css";
+import { StoryIcon } from "./StoryIcon";
+import { WorldLandscape } from "./WorldArt";
 
 export function WorldScene({ theme }: { theme: string | undefined }) {
   const scenery = theme ? getTheme(theme).emojis.slice(2, 5) : ["🌿", "☁️", "🌻"];

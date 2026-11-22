@@ -1,7 +1,8 @@
 import { useEffect, useRef } from "react";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
-import styles from "./Puzzimori.module.css";
+import controls from "./Controls.module.css";
+import styles from "./Dialog.module.css";
 
 export function ReplaceDialog({
   locale,
@@ -43,10 +44,15 @@ export function ReplaceDialog({
       <h2 id="replace-title">{m.replaceTitle}</h2>
       <p id="replace-body">{m.replaceBody}</p>
       <div className={styles.dialogButtons}>
-        <button type="button" ref={cancelRef} className={styles.secondaryButton} onClick={onCancel}>
+        <button
+          type="button"
+          ref={cancelRef}
+          className={controls.secondaryButton}
+          onClick={onCancel}
+        >
           {m.cancel}
         </button>
-        <button type="button" className={styles.primaryButton} onClick={onConfirm}>
+        <button type="button" className={controls.primaryButton} onClick={onConfirm}>
           {m.replaceConfirm}
         </button>
       </div>
