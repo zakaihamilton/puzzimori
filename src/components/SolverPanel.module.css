@@ -1,0 +1,287 @@
+/* --------------------------------------------------------------------------
+   Solver Station: The Child's Discovery Desk
+   -------------------------------------------------------------------------- */
+.solver {
+  grid-column: 1;
+  grid-row: 1;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #fffdf8 0%, #faf3e6 100%);
+  border: 2px solid var(--line-strong);
+  border-radius: 20px;
+  padding: 12px 16px;
+  box-shadow:
+    0 4px 14px rgba(78, 59, 36, 0.08),
+    inset 0 0 20px rgba(220, 205, 175, 0.12);
+  overflow: hidden;
+}
+
+/* Solver Form & Target Answer Card */
+.solverForm {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.solverPrompt {
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: clamp(15px, 2.2vh, 18px);
+  font-weight: 700;
+  color: #5c432d;
+  margin-block-end: clamp(2px, 0.6vh, 6px);
+}
+
+.targetHeading {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 1.5vw, 16px);
+  margin: 0 0 clamp(4px, 1vh, 8px);
+  direction: ltr;
+}
+
+.targetCard {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(6px, 1vw, 12px);
+}
+
+.targetEquals {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.8vh, 44px);
+  font-weight: 800;
+  color: #7b654f;
+}
+
+.targetOutput {
+  display: grid;
+  place-items: center;
+  min-width: clamp(88px, 13vw, 136px);
+  height: clamp(54px, 8.2vh, 74px);
+  padding: 0 clamp(12px, 1.8vw, 22px);
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+  border: 3px solid var(--gold);
+  border-radius: clamp(14px, 1.8vh, 18px);
+  box-shadow:
+    0 0 0 3px var(--gold-glow),
+    0 4px 12px rgba(200, 138, 44, 0.2),
+    inset 0 2px 4px rgba(200, 138, 44, 0.08);
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 4.6vh, 42px);
+  font-weight: 800;
+  color: #2b1f14;
+  letter-spacing: 2px;
+  outline: none;
+  cursor: default;
+}
+
+.answerDigit {
+  display: inline-block;
+  animation: digitPop 150ms ease-out;
+}
+
+/* --------------------------------------------------------------------------
+   Tactile Wooden Block Keypad: Chunky & Tablet-Ready
+   -------------------------------------------------------------------------- */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(6px, 1.2vh, 12px);
+  margin: clamp(6px, 1.2vh, 12px) 0;
+  direction: ltr;
+  width: 100%;
+}
+
+.keypad button {
+  height: clamp(48px, 7.5vh, 76px);
+  min-height: 46px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf6f0 55%, #f2ebde 100%);
+  border: 2px solid #dfd1bd;
+  border-radius: clamp(12px, 1.6vh, 18px);
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.8vh, 34px);
+  font-weight: 800;
+  color: #3b2c1f;
+  box-shadow:
+    0 4px 0 #cbba9f,
+    0 5px 8px rgba(60, 42, 20, 0.12),
+    inset 0 1px 2px #ffffff;
+  transition:
+    transform 80ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    box-shadow 80ms cubic-bezier(0.2, 0.8, 0.3, 1),
+    background 150ms;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.keypad button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdfa 55%, #f6efe3 100%);
+  transform: translateY(-1px);
+  box-shadow:
+    0 5px 0 #cbba9f,
+    0 6px 12px rgba(60, 42, 20, 0.15);
+}
+
+.keypad button:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #cbba9f,
+    0 2px 4px rgba(60, 42, 20, 0.12);
+}
+
+.keypad button[data-answer-key]:last-child {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 55%, #fecaca 100%);
+  border-color: #fca5a5;
+  color: #b91c1c;
+  box-shadow:
+    0 4px 0 #f87171,
+    0 5px 8px rgba(239, 68, 68, 0.15),
+    inset 0 1px 2px #ffffff;
+}
+
+.keypad button[data-answer-key]:last-child:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #f87171,
+    0 2px 4px rgba(239, 68, 68, 0.15);
+}
+
+.keypadSpacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.solverForm > button,
+.solver form > button {
+  height: clamp(48px, 7vh, 66px);
+  min-height: 46px;
+  font-size: clamp(18px, 2.6vh, 23px);
+  font-weight: 800;
+  border-radius: clamp(12px, 1.6vh, 18px);
+  padding: 8px 18px;
+  touch-action: manipulation;
+}
+
+/* Live Feedback Notice */
+.feedback {
+  flex-shrink: 0;
+  font-size: clamp(14px, 2vh, 17px);
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 4px 0 0;
+  text-align: center;
+  color: var(--muted);
+  min-height: clamp(20px, 3vh, 26px);
+}
+
+.feedback[data-feedback="correct"] {
+  color: var(--sage-dark);
+}
+
+.feedback[data-feedback="incorrect"] {
+  color: var(--crimson);
+}
+
+.feedback[data-feedback="invalid"] {
+  color: var(--crimson-dark);
+}
+
+.feedback[data-feedback="ready"] {
+  visibility: hidden;
+}
+
+@keyframes digitPop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 680px) {
+  .solver {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+
+  .targetHeading {
+    gap: 8px;
+    margin: 0 0 4px;
+  }
+
+  .targetEquals {
+    font-size: 22px;
+  }
+
+  .targetOutput {
+    min-width: 64px;
+    height: 38px;
+    min-height: 38px;
+    font-size: 22px;
+    padding: 0 8px;
+    border-radius: 12px;
+  }
+
+  .keypad {
+    gap: 4px;
+    margin: 4px 0;
+  }
+
+  .keypad button {
+    height: clamp(38px, 5.2vh, 46px);
+    min-height: 38px;
+    font-size: 19px;
+    border-radius: 10px;
+  }
+
+  .solverForm > button,
+  .solver form > button {
+    height: clamp(38px, 5.2vh, 46px);
+    min-height: 38px;
+    font-size: 15px;
+    border-radius: 10px;
+  }
+}
+
+@media (max-height: 520px) {
+  .targetHeading {
+    gap: 6px;
+    margin: 0 0 2px;
+  }
+  .targetEquals {
+    font-size: 18px;
+  }
+  .targetOutput {
+    min-width: 56px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 20px;
+  }
+  .keypad {
+    gap: 3px;
+    margin: 2px 0;
+  }
+  .keypad button {
+    height: 32px;
+    min-height: 32px;
+    font-size: 16px;
+  }
+  .solverForm > button,
+  .solver form > button {
+    height: 32px;
+    min-height: 32px;
+    font-size: 13px;
+  }
+}

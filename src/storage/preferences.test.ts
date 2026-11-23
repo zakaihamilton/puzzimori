@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadAnimations, preferencesKey, saveAnimations } from "./preferences";
+
 function memory(raw: string | null = null) {
   return {
     getItem: (key: string) => (key === preferencesKey ? raw : null),

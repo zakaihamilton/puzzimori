@@ -1,6 +1,6 @@
 import { generatePuzzle } from "../engine/generator";
 import { themes } from "../engine/themes";
-import { newGame, type GameState, type Locale, type SavedData } from "../game/state";
+import { type GameState, type Locale, newGame, type SavedData } from "../game/state";
 
 export const storageKey = "puzzimori.game.v2";
 const legacyKey = "puzzimori.profiles.v1";

@@ -1,5 +1,5 @@
-import { StoryIcon } from "./StoryIcon";
 import styles from "./Motion.module.css";
+import { StoryIcon } from "./StoryIcon";
 
 export type Reaction = "idle" | "correct" | "retry" | "hint" | "complete";
 

@@ -1,0 +1,169 @@
+/* --------------------------------------------------------------------------
+   Completion / Celebration Scroll
+   -------------------------------------------------------------------------- */
+.completion {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  isolation: isolate;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 24px;
+  background: linear-gradient(180deg, #f9fdf8 0%, #edf7eb 100%);
+  border: 2px solid #b7d6b3;
+  border-radius: 20px;
+  box-shadow:
+    0 4px 16px rgba(55, 110, 60, 0.08),
+    inset 0 0 24px rgba(200, 235, 195, 0.15);
+}
+
+.celebration {
+  display: grid;
+  place-items: center;
+  position: relative;
+  inline-size: clamp(80px, 14vh, 132px);
+  block-size: clamp(80px, 14vh, 132px);
+  margin-block: 0 10px;
+  margin-inline: auto;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffe4a980 0%, #ffe4a930 45%, transparent 70%);
+}
+
+.rewardStar {
+  inline-size: 85%;
+  block-size: 85%;
+  filter: drop-shadow(0 5px 2px #a8762426);
+}
+
+:global([data-celebrate="true"]) .rewardStar {
+  animation: rewardReveal 550ms ease-out both;
+}
+
+.rewardSparkle {
+  position: absolute;
+  opacity: 0;
+  font-size: 20px;
+  font-style: normal;
+  color: var(--gold);
+}
+
+:global([data-celebrate="true"]) .rewardSparkle {
+  animation: party 900ms ease-out both;
+  animation-delay: 250ms;
+}
+
+.rewardSparkle:nth-of-type(1) {
+  inset-inline-start: -2%;
+  inset-block-start: 35%;
+}
+
+.rewardSparkle:nth-of-type(2) {
+  inset-inline-end: -2%;
+  inset-block-start: 55%;
+  animation-delay: 400ms;
+}
+
+.rewardSparkle:nth-of-type(3) {
+  inset-inline-start: 55%;
+  inset-block-start: 5%;
+  animation-delay: 550ms;
+}
+
+:global([data-celebrate="true"]) .completion > :is(span, h2, p) {
+  animation: completionText 300ms ease-out 200ms both;
+}
+
+@keyframes rewardReveal {
+  0% {
+    transform: scale(0.6) rotate(-12deg);
+  }
+  65% {
+    transform: scale(1.12) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes completionText {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes party {
+  0% {
+    transform: translateY(6px) scale(0.5);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-30px) rotate(80deg);
+    opacity: 0;
+  }
+}
+
+:global([data-motion="off"]) .rewardSparkle {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rewardSparkle {
+    display: none;
+  }
+}
+
+.completion h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 3.5vh, 30px);
+  font-weight: 700;
+  color: #1e3e25;
+  margin: 4px 0 6px;
+  letter-spacing: -0.4px;
+}
+
+.completion > p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #43664a;
+  margin: 0 0 16px;
+}
+
+.completion > button {
+  width: 100%;
+}
+
+.suggestion {
+  margin-block-start: 14px;
+  padding-block-start: 10px;
+  border-block-start: 1.5px dashed #bcd9b8;
+  font-size: 13px;
+  color: #3b5c41;
+}
+
+.suggestion small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-block-start: 4px;
+}
+
+@media (max-width: 680px) {
+  .completion {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 8px 12px;
+    border-radius: 16px;
+  }
+}

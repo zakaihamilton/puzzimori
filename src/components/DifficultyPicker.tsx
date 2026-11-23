@@ -2,8 +2,8 @@ import { useRef, useState } from "react";
 import { getDifficulty } from "../engine/difficulty";
 import type { Locale } from "../game/state";
 import { messages } from "../i18n/messages";
+import styles from "./DifficultyPicker.module.css";
 import { Tooltip } from "./Tooltip";
-import styles from "./Puzzimori.module.css";
 
 export function DifficultyPicker({
   level,

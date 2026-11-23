@@ -1,12 +1,13 @@
-import { Tooltip } from "./Tooltip";
 import React, { useEffect, useRef, useState } from "react";
 import { themes } from "../engine/themes";
 import type { Locale, SavedData } from "../game/state";
 import { messages } from "../i18n/messages";
 import { Companion } from "./Companion";
-import { WorldCover } from "./WorldArt";
+import controls from "./Controls.module.css";
 import { StoryIcon } from "./StoryIcon";
-import styles from "./Puzzimori.module.css";
+import styles from "./ThemeGallery.module.css";
+import { Tooltip } from "./Tooltip";
+import { WorldCover } from "./WorldArt";
 
 export function ThemeGallery({
   progress,
@@ -84,7 +85,7 @@ export function ThemeGallery({
           </div>
         </div>
         <span className={styles.worldCount}>
-          <span className={styles.srOnly}>{m.completedLabel}: </span>
+          <span className={controls.srOnly}>{m.completedLabel}: </span>
           <span aria-hidden="true">🌟 </span>
           {progress.completed}
         </span>

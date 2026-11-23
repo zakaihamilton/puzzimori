@@ -1,12 +1,12 @@
 import {
+  type CSSProperties,
   cloneElement,
+  type ReactElement,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
-  useLayoutEffect,
   useSyncExternalStore,
-  type ReactElement,
-  type CSSProperties,
 } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Tooltip.module.css";
